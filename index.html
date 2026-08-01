@@ -236,9 +236,9 @@ const STORAGE_KEY = 'fiches-raphael-data';
    Désactivée par défaut. Pour l'activer, suis les instructions fournies à part (création
    d'un projet Supabase gratuit), puis colle ton URL et ta clé "anon public" ci-dessous et
    passe SYNC_ENABLED à true. Cette fois, tout se synchronise : le texte ET les photos/fichiers joints. */
-const SYNC_ENABLED = false;
-const SUPABASE_URL = '';
-const SUPABASE_ANON_KEY = '';
+const SYNC_ENABLED = true;
+const SUPABASE_URL = 'https://gjhhksgzsprhidqmzqme.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_9NVioQzReAQo8S2Pda1a1g_vwSFk9QA';
 
 let sb = null;
 if(SYNC_ENABLED && SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase){
