@@ -1,0 +1,3275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Les Fiches de Raphaël</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6B5645">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mes Fiches">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Parisienne&family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@700;900&family=Caveat:wght@600&family=Lora:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.17.0/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root{
+    --paper: #F3EADC;
+    --paper-card: #FDF9F1;
+    --ink: #2B2019;
+    --ink-soft: #7A6A58;
+    --ink-faint: #A8967E;
+    --border: #E2D2B8;
+    --accent: #C1452A;
+    --accent-soft: #E7CBBE;
+    --brown-block: #6B5645;
+    --radius: 12px;
+    --shadow: 0 2px 4px rgba(43,32,25,0.07), 0 8px 20px rgba(43,32,25,0.07);
+    --font-display: 'Anton', sans-serif;
+    --font-script: 'Parisienne', cursive;
+    --font-body: 'Poppins', system-ui, sans-serif;
+  }
+  [data-theme="dark"]{
+    --paper: #1E1710;
+    --paper-card: #2A2119;
+    --ink: #F3EADC;
+    --ink-soft: #C9BBA8;
+    --ink-faint: #8C7C68;
+    --border: #453824;
+    --accent: #E37650;
+    --accent-soft: #4A3626;
+    --shadow: 0 2px 4px rgba(0,0,0,0.25), 0 8px 20px rgba(0,0,0,0.3);
+  }
+
+  /* ---------- Palettes de couleurs ---------- */
+  [data-palette="sauge"]{
+    --paper: #EEF0E3; --paper-card: #F8FAF1; --ink: #232B1E; --ink-soft: #5C6650; --ink-faint: #8B9480;
+    --border: #D6DEC5; --accent: #5F7A52; --accent-soft: #D9E3CE; --brown-block: #4A5A3F;
+  }
+  [data-palette="sauge"][data-theme="dark"]{
+    --paper: #171C13; --paper-card: #21281B; --ink: #EEF0E3; --ink-soft: #BFC8AE; --ink-faint: #7C8770;
+    --border: #384130; --accent: #8CAE79; --accent-soft: #3A4530;
+  }
+  [data-palette="lavande"]{
+    --paper: #EFE9F1; --paper-card: #FAF6FB; --ink: #2A2130; --ink-soft: #685A70; --ink-faint: #9B8CA3;
+    --border: #DBCBE0; --accent: #6B4E71; --accent-soft: #E4D3E8; --brown-block: #4E3C55;
+  }
+  [data-palette="lavande"][data-theme="dark"]{
+    --paper: #1B1520; --paper-card: #251E2C; --ink: #EFE9F1; --ink-soft: #C6B9CC; --ink-faint: #8A7C92;
+    --border: #3B2F42; --accent: #A882AF; --accent-soft: #402F47;
+  }
+  [data-palette="ocean"]{
+    --paper: #E8EEF0; --paper-card: #F6FAFB; --ink: #1D2B30; --ink-soft: #4E6A72; --ink-faint: #8CA3A8;
+    --border: #C9DBDF; --accent: #2C6E8E; --accent-soft: #D2E4EA; --brown-block: #24505F;
+  }
+  [data-palette="ocean"][data-theme="dark"]{
+    --paper: #121C1F; --paper-card: #1B2A2E; --ink: #E8EEF0; --ink-soft: #AEC5C9; --ink-faint: #72898D;
+    --border: #2C4045; --accent: #6FB2D2; --accent-soft: #26424B;
+  }
+
+  /* ---------- Contraste élevé (l'emporte sur la palette choisie) ---------- */
+  [data-contrast="high"]{
+    --paper: #FFFFFF; --paper-card: #FFFFFF; --ink: #000000; --ink-soft: #000000; --ink-faint: #333333;
+    --border: #000000; --accent: #A80000; --accent-soft: #FFD9D9; --shadow: none;
+  }
+  [data-contrast="high"][data-theme="dark"]{
+    --paper: #000000; --paper-card: #000000; --ink: #FFFFFF; --ink-soft: #FFFFFF; --ink-faint: #D0D0D0;
+    --border: #FFFFFF; --accent: #FFD400; --accent-soft: #3A3000;
+  }
+  [data-contrast="high"] .btn.ghost, [data-contrast="high"] .fiche-card, [data-contrast="high"] .subject-card,
+  [data-contrast="high"] .form-panel, [data-contrast="high"] .fiche-detail{ border-width:2.5px; }
+  [data-contrast="high"] .tag-chip, [data-contrast="high"] .link-chip{ border-width:2px; }
+
+  /* ---------- Réduire les animations (interrupteur manuel, en plus de la préférence système) ---------- */
+  [data-reduce-motion="1"] *{ transition:none !important; animation:none !important; }
+  *{ box-sizing: border-box; }
+  body{ margin:0; background: var(--paper); color: var(--ink); transition: background 150ms ease, color 150ms ease;
+    font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+  .display{ font-family: var(--font-display); text-transform:uppercase; letter-spacing:0.5px; }
+  .script{ font-family: var(--font-script); text-transform:none; letter-spacing:0; }
+  button, input, select, textarea{ font-family: inherit; }
+  a{ color: inherit; }
+
+  .layout{ display:flex; min-height:100vh; align-items:stretch; }
+
+  /* ---------- Rail ---------- */
+  .rail{
+    width: 270px; flex-shrink:0; background: var(--paper); border-right: 1px solid var(--border);
+    padding: 30px 18px 20px; display:flex; flex-direction:column; position:relative;
+  }
+  .rail-brand-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .rail-icon-buttons{ display:flex; align-items:center; gap:6px; flex-shrink:0; }
+  .icon-btn{ background:transparent; border:1.5px solid var(--border); border-radius:6px; width:28px; height:28px;
+    cursor:pointer; color: var(--ink-soft); font-size:0.95rem; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .icon-btn:hover{ border-color: var(--accent); color: var(--accent); }
+  .rail-reopen{ position:fixed; top:20px; left:20px; z-index:100; background: var(--ink); color: var(--paper);
+    border:none; width:42px; height:42px; border-radius:10px; cursor:pointer; font-size:1.15rem; box-shadow: var(--shadow); }
+  .layout.rail-collapsed .main{ max-width:none; }
+  .theme-toggle{ background:transparent; border:1.5px solid var(--border); border-radius:8px; width:34px; height:34px;
+    font-size:1rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .theme-toggle:hover{ border-color: var(--accent); }
+  .font-size-control{ display:flex; align-items:center; gap:6px; }
+  .font-btn{ background:transparent; border:1.5px solid var(--border); border-radius:6px; width:26px; height:26px;
+    cursor:pointer; color: var(--ink-soft); font-size:0.72rem; font-weight:700; }
+  .font-btn:hover{ border-color: var(--accent); color: var(--accent); }
+  .font-size-value{ font-size:0.68rem; color: var(--ink-faint); min-width:32px; text-align:center; }
+  .brand{ font-size:1.5rem; line-height:1.05; margin-bottom:4px; }
+  .brand .script{ font-size:1.5rem; color: var(--accent); display:block; margin-top:-4px; }
+  .rail-sub{ font-size:0.68rem; letter-spacing:1px; color: var(--ink-faint); text-transform:uppercase; margin-bottom:14px; }
+
+  .rail-top{ }
+  .rail-nav{ display:flex; flex-direction:column; flex:1; min-height:0; }
+
+  .rail-search{ margin-bottom:14px; }
+  .rail-search input{ width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:8px;
+    background: var(--paper-card); font-size:0.85rem; color: var(--ink); }
+  .rail-search input:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+
+  .home-row{
+    background:transparent; border:none; text-align:left; cursor:pointer; width:100%;
+    padding:10px 8px; font-weight:600; font-size:0.92rem; color: var(--ink-soft);
+    border-bottom:1px solid var(--border); margin-bottom:10px; transition: color 150ms ease;
+  }
+  .home-row:hover{ color: var(--ink); }
+  .home-row.active{ color: var(--ink); font-weight:700; }
+
+  .rail-subjects{ display:flex; flex-direction:column; overflow-y:auto; flex:1; }
+  .tab{
+    border:none; cursor:pointer; text-align:left; display:flex; align-items:center; gap:9px;
+    width:100%; padding:11px 9px; background:transparent; color: var(--ink);
+    border-bottom:1px solid var(--border); transition: transform 150ms ease, background 150ms ease, padding 150ms ease;
+  }
+  .tab-badge{
+    font-family: var(--font-display); font-size:0.72rem; background: var(--ink); color: var(--paper);
+    width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .tab-dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .tab-name{ font-size:0.86rem; font-weight:600; flex:1; line-height:1.2; }
+  .tab-count{ font-size:0.72rem; color: var(--ink-faint); flex-shrink:0; }
+  .tab:hover{ background: var(--paper-card); }
+  .tab.active{
+    background: var(--tab-color); color: var(--tab-text); border-radius: 8px; border-bottom-color: transparent;
+    transform: translateX(4px); box-shadow: var(--shadow); margin: 2px 0;
+  }
+  .tab.active .tab-badge{ background: rgba(255,255,255,0.28); color: var(--tab-text); }
+  .tab.active .tab-count{ color: var(--tab-text); opacity:0.85; }
+
+  .add-subject-btn{
+    margin-top:16px; background:transparent; border:1.5px dashed var(--ink-faint); color: var(--ink-soft);
+    padding:10px 12px; border-radius:8px; cursor:pointer; font-size:0.8rem; text-align:left; font-weight:600;
+    transition: border-color 150ms ease, color 150ms ease;
+  }
+  .add-subject-btn:hover{ border-color: var(--accent); color: var(--accent); }
+
+  /* ---------- Main ---------- */
+  .main{ flex:1; padding: 54px 58px; max-width: 960px; position:relative; }
+  .eyebrow{ font-size:0.72rem; letter-spacing:1.5px; text-transform:uppercase; color: var(--ink-faint);
+    font-weight:600; margin:0 0 12px; }
+  h1.hero{ font-size:3.1rem; line-height:0.98; margin:0; }
+  h1.hero .script{ font-size:2.5rem; display:block; margin-top:2px; }
+  .lede{ font-size:1rem; color: var(--ink-soft); max-width:56ch; line-height:1.6; margin: 20px 0 20px; }
+  .doodle-corner{ position:absolute; top:36px; right:50px; opacity:0.9; }
+
+  .resume-card{ display:inline-flex; align-items:center; gap:8px; background: var(--paper-card);
+    border:1.5px solid var(--border); border-radius:999px; padding:9px 18px; font-size:0.86rem;
+    cursor:pointer; margin-bottom:26px; box-shadow: var(--shadow); }
+  .resume-label{ font-weight:700; color: var(--accent); text-transform:uppercase; font-size:0.68rem; letter-spacing:0.4px; }
+
+  .stats-row{ display:flex; gap:36px; margin-bottom:38px; }
+  .stat .num{ font-family: var(--font-display); font-size:2rem; color: var(--accent); line-height:1; }
+  .stat .label{ font-size:0.72rem; letter-spacing:0.5px; text-transform:uppercase; color: var(--ink-faint); margin-top:4px; }
+
+  .grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:16px; margin-bottom:42px; }
+  .subject-card{
+    background: var(--paper-card); border:2.5px solid var(--border); border-radius: var(--radius);
+    padding:16px 18px; cursor:pointer; box-shadow: var(--shadow); transition: transform 150ms ease, rotate 150ms ease;
+    rotate: var(--rot, -0.6deg);
+  }
+  .subject-card:nth-child(even){ --rot: 0.6deg; }
+  .subject-card:hover{ transform: translateY(-3px); rotate: 0deg; }
+  .card-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .swatch{ width:12px; height:12px; border-radius:50%; display:inline-block; }
+  .subject-card .name{ font-weight:700; font-size:0.96rem; }
+  .subject-card .count{ font-size:0.76rem; color: var(--ink-soft); }
+
+  .howitworks{ background: var(--paper-card); border-top:3px solid var(--ink); border-radius: 4px var(--radius) var(--radius) var(--radius); padding:24px 26px; margin-bottom: 30px; box-shadow: var(--shadow); }
+  .howitworks h2{ font-size:1.15rem; margin:0 0 6px; font-weight:700; }
+  .howitworks .underline{ display:block; width:120px; height:8px; margin:-4px 0 14px; }
+  .howitworks ol{ margin:0; padding-left:20px; }
+  .howitworks li{ margin-bottom:10px; color: var(--ink-soft); font-size:0.9rem; line-height:1.55; }
+  .howitworks li b{ color: var(--ink); }
+  .howitworks .note{ font-size:0.8rem; color: var(--ink-faint); margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
+
+  .footer-link{ font-size:0.76rem; color: var(--ink-faint); background:none; border:none; cursor:pointer; padding:0; text-decoration:underline; }
+  .backup-row{ margin-top:18px; display:flex; gap:18px; flex-wrap:wrap; align-items:center; }
+
+  /* Subject view */
+  .subject-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:14px; }
+  .subject-header h1{ font-size:2.2rem; margin:0; display:flex; align-items:center; gap:12px; }
+  .subject-header .swatch-lg{ width:20px; height:20px; border-radius:6px; }
+  .subject-header .meta{ font-size:0.78rem; color: var(--ink-soft); margin-top:4px; }
+  .btn{
+    background: var(--accent); color:#FDF9F1; border:none; padding:11px 20px; border-radius:8px;
+    font-weight:700; font-size:0.86rem; cursor:pointer; transition: opacity 150ms ease; font-family: var(--font-body);
+  }
+  .btn:hover{ opacity:0.87; }
+  .btn.ghost{ background:transparent; color: var(--ink); border:1.5px solid var(--border); }
+  .btn.small{ padding:8px 14px; font-size:0.78rem; }
+
+  .empty-state{ border:2px dashed var(--border); border-radius: var(--radius); padding:44px 30px; text-align:center; color: var(--ink-soft); background: var(--paper-card); }
+  .empty-state p{ margin:0 0 20px; font-size:0.94rem; }
+
+  .fiche-card{
+    background: var(--paper-card); border:2.5px solid var(--border); border-radius: var(--radius); padding:16px 18px;
+    cursor:pointer; box-shadow: var(--shadow); transition: transform 150ms ease, rotate 150ms ease;
+    rotate: var(--rot, -0.5deg);
+  }
+  .fiche-card:nth-child(even){ --rot: 0.5deg; }
+  .fiche-card:hover{ transform: translateY(-3px); rotate:0deg; }
+  .fiche-card .title{ font-weight:700; font-size:0.98rem; margin-bottom:4px; }
+  .fiche-card .date{ font-size:0.72rem; color: var(--ink-faint); text-transform:uppercase; letter-spacing:0.4px; }
+  .fiche-card .preview{ font-size:0.84rem; color: var(--ink-soft); margin-top:8px; overflow:hidden;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+
+  /* Fiche detail */
+  .back-link{ background:none; border:none; cursor:pointer; color: var(--ink-soft); font-size:0.85rem;
+    padding:0; margin-bottom:20px; display:inline-flex; align-items:center; gap:6px; font-weight:600; }
+  .back-link:hover{ color: var(--accent); }
+  .fiche-detail{ background: var(--paper-card); border:1px solid var(--border); border-radius: var(--radius); padding:36px 40px; box-shadow: var(--shadow);
+    position:relative; margin-top:16px; }
+  .fiche-detail::before{
+    content:''; position:absolute; top:-10px; left:44px; width:64px; height:20px;
+    background: var(--tape-color, var(--accent)); opacity:0.55; border-radius:2px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+  }
+  .fiche-detail .fiche-title{ font-size:2rem; margin:0 0 8px; }
+  .fiche-detail .fiche-date{ font-size:0.75rem; color: var(--ink-faint); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+  .fiche-content{ line-height:1.65; font-size:0.96rem; margin-top:18px; }
+  .fiche-attachments{ display:flex; flex-direction:column; gap:14px; margin:16px 0; }
+  .fiche-attachment{ margin:0; }
+  .fiche-attachment img{ max-width:100%; border-radius: var(--radius); border:1px solid var(--border); display:block; }
+  .fiche-attachment audio{ width:100%; }
+  .fiche-actions{ margin-top:30px; padding-top:20px; border-top:1px solid var(--border); display:flex; gap:10px; flex-wrap:wrap; }
+
+  .linked-fiches{ margin-top:24px; padding-top:18px; border-top:1px solid var(--border); }
+  .fiche-sources{ font-size:0.8rem; color: var(--ink-faint); font-style:italic; margin:16px 0 0; }
+  .print-sources{ font-size:0.8rem; color:#555; font-style:italic; margin-top:14px; }
+  .card-tags{ margin-top:8px; display:flex; flex-wrap:wrap; gap:5px; }
+  .tag-chip-mini{ font-size:0.68rem; background: var(--paper); border:1px solid var(--border); color: var(--ink-faint);
+    padding:2px 8px; border-radius:999px; }
+  .fiche-tags{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+  .tag-chip{ font-size:0.75rem; background: var(--paper); border:1.5px solid var(--border); color: var(--ink-soft);
+    padding:4px 12px; border-radius:999px; cursor:pointer; }
+  .tag-chip:hover{ border-color: var(--accent); color: var(--accent); }
+  .linked-label{ font-size:0.7rem; text-transform:uppercase; letter-spacing:0.6px; color: var(--ink-faint); margin-bottom:10px; font-weight:700; }
+  .link-chip{ display:inline-block; background: var(--paper); border:1.5px solid var(--border); color: var(--ink);
+    padding:7px 14px; border-radius:999px; font-size:0.82rem; cursor:pointer; margin:0 8px 8px 0; }
+  .link-chip:hover{ border-color: var(--accent); color: var(--accent); }
+
+  .history-section{ margin-top:24px; padding-top:18px; border-top:1px solid var(--border); }
+  .history-section summary{ cursor:pointer; font-size:0.8rem; font-weight:700; color: var(--ink-soft);
+    text-transform:uppercase; letter-spacing:0.4px; }
+  .history-item{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 0; border-bottom:1px solid var(--border); }
+  .history-item:last-child{ border-bottom:none; }
+  .history-date{ font-size:0.72rem; color: var(--ink-faint); white-space:nowrap; }
+  .history-title{ flex:1; font-size:0.86rem; color: var(--ink-soft); }
+
+  .connection-result{ font-size:0.78rem; color: var(--ink-soft); margin-top:10px; }
+
+  .attach-preview-list{ display:flex; flex-direction:column; gap:8px; }
+
+  /* Forms */
+  .form-panel{ background: var(--paper-card); border:1px solid var(--border); border-radius: var(--radius); padding:32px 36px; max-width:640px; box-shadow: var(--shadow); }
+  .form-panel h1{ font-size:1.7rem; margin:0 0 22px; }
+  .smart-paste-btn{ width:100%; margin-bottom:6px; background: var(--brown-block); }
+  .smart-paste-hint{ font-size:0.75rem; color: var(--ink-faint); margin:0 0 22px; }
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:0.78rem; font-weight:700; color: var(--ink-soft); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.4px; }
+  .field select[multiple]{ min-height:110px; }
+  .field input[type=text], .field select, .field textarea{
+    width:100%; padding:11px 13px; border:1.5px solid var(--border); border-radius:8px; font-size:0.92rem;
+    background: var(--paper); color: var(--ink); font-family: var(--font-body);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+  .field textarea{ min-height:260px; resize:vertical; line-height:1.5; }
+  .paste-row{ margin-bottom:10px; }
+  .attach-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+  .attach-chip{ display:flex; align-items:center; gap:10px; background: var(--paper); border:1.5px solid var(--border);
+    border-radius:8px; padding:8px 12px; margin-top:4px; }
+  .attach-chip img{ max-height:70px; border-radius:6px; display:block; }
+  .swatch-picker{ display:flex; gap:9px; flex-wrap:wrap; }
+  .swatch-option{ width:32px; height:32px; border-radius:50%; cursor:pointer; border:2px solid transparent; }
+  .swatch-option.selected{ border-color: var(--ink); }
+  .form-actions{ display:flex; gap:10px; margin-top:26px; }
+
+  .manage-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
+  .manage-row{ display:flex; align-items:center; gap:10px; padding:12px 14px; border:1.5px solid var(--border);
+    border-radius:8px; background: var(--paper); flex-wrap:wrap; }
+  .manage-name{ flex:1; font-weight:600; font-size:0.9rem; }
+  .manage-count{ color: var(--ink-faint); font-weight:400; font-size:0.8rem; }
+  .manage-actions{ display:flex; gap:6px; flex-wrap:wrap; }
+  .manage-actions .btn[disabled]{ opacity:0.35; cursor:not-allowed; }
+  .drag-handle{ cursor:grab; color: var(--ink-faint); font-size:1.1rem; padding:0 2px; }
+  .manage-row[draggable="true"]:active{ cursor:grabbing; }
+
+  .sort-filter-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+  .sort-filter-row select{ padding:8px 10px; border:1.5px solid var(--border); border-radius:8px;
+    background: var(--paper-card); color: var(--ink); font-size:0.82rem; }
+  .chapter-heading{ font-family: var(--font-display); font-size:1rem; letter-spacing:0.4px; text-transform:uppercase;
+    color: var(--ink-soft); margin:26px 0 12px; padding-bottom:6px; border-bottom:1.5px solid var(--border); }
+  .chapter-heading:first-of-type{ margin-top:0; }
+
+  /* Fiche du jour */
+  .day-fiche-card{ background: var(--brown-block); color:#FDF9F1; border-radius: var(--radius); padding:14px 20px;
+    margin-bottom:26px; cursor:pointer; box-shadow: var(--shadow); flex:1; min-width:200px; }
+  .day-fiche-label{ font-size:0.68rem; text-transform:uppercase; letter-spacing:1px; opacity:0.85; margin-bottom:4px; }
+  .day-fiche-title{ font-weight:700; font-size:1.02rem; }
+
+  /* Rappel doux */
+  .reminder-card{ background: var(--paper-card); border-left:4px solid var(--accent); border-radius:8px;
+    padding:14px 18px; margin-bottom:22px; }
+  .reminder-label{ font-size:0.72rem; text-transform:uppercase; letter-spacing:0.5px; color: var(--accent);
+    font-weight:700; margin-bottom:6px; }
+  .reminder-line{ font-size:0.88rem; color: var(--ink-soft); margin-bottom:4px; }
+  .reminder-line b{ color: var(--ink); }
+
+  /* Graphique hebdomadaire */
+  .weekly-chart{ display:flex; align-items:flex-end; gap:10px; height:130px; padding-top:10px; }
+  .chart-bar-wrap{ display:flex; flex-direction:column; align-items:center; flex:1; }
+  .chart-bar{ width:100%; max-width:28px; background: var(--accent); border-radius:4px 4px 0 0; min-height:4px; }
+  .chart-bar-label{ font-size:0.62rem; color: var(--ink-faint); margin-top:6px; white-space:nowrap; }
+
+  /* Objectif hebdomadaire */
+  .goal-row{ margin-bottom:14px; }
+  .goal-bar-track{ background: var(--paper); border:1px solid var(--border); border-radius:999px; height:14px; overflow:hidden; margin-bottom:8px; }
+  .goal-bar-fill{ background: var(--accent); height:100%; border-radius:999px; transition:width 300ms ease; }
+  .goal-text{ font-size:0.82rem; color: var(--ink-soft); }
+  .goal-edit{ display:flex; align-items:center; gap:8px; font-size:0.85rem; flex-wrap:wrap; }
+  .settings-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:14px; font-size:0.88rem; color: var(--ink-soft); flex-wrap:wrap; }
+  .settings-row:last-child{ margin-bottom:0; }
+  .goal-edit input{ width:64px; padding:6px 8px; border:1.5px solid var(--border); border-radius:6px; background: var(--paper); color: var(--ink); }
+
+  /* Flashcards & quiz */
+  .flashcard-progress{ font-size:0.8rem; color: var(--ink-faint); margin-bottom:14px; text-align:center; }
+  .flashcard{ background: var(--paper-card); border:1px solid var(--border); border-radius: var(--radius);
+    padding:44px 36px; text-align:center; box-shadow: var(--shadow); min-height:180px; }
+  .flashcard-title{ font-size:1.5rem; margin:0 0 20px; }
+  .flashcard .fiche-content{ text-align:left; margin-top:16px; }
+  .flashcard .fiche-attachment{ text-align:left; }
+  .flashcard-nav{ display:flex; justify-content:space-between; gap:10px; margin-top:24px; }
+
+  /* Minuteur */
+  .pomodoro-modes{ display:flex; gap:10px; margin-bottom:24px; }
+  .pomodoro-display{ text-align:center; background: var(--paper-card); border:1px solid var(--border);
+    border-radius: var(--radius); padding:50px 20px; margin-bottom:24px; box-shadow: var(--shadow); }
+  .pomodoro-time{ font-family: var(--font-display); font-size:4rem; color: var(--accent); line-height:1; }
+  .pomodoro-label{ color: var(--ink-soft); margin-top:10px; text-transform:uppercase; font-size:0.8rem; letter-spacing:1px; }
+  .checkbox-row{ display:flex; align-items:center; gap:10px; margin-bottom:24px; font-size:0.86rem; color: var(--ink-soft); cursor:pointer; }
+  .reset-confirm-box{ background: var(--paper); border:1.5px solid #A3342A; border-radius:10px; padding:16px 18px; margin-top:8px; }
+
+  /* Floating quick-add button */
+  .fab{
+    position:fixed; bottom:26px; right:26px; width:58px; height:58px; border-radius:50%;
+    background: var(--accent); color:#FDF9F1; border:none; font-size:1.9rem; line-height:1;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:100;
+    box-shadow: 0 8px 20px rgba(43,32,25,0.28); transition: transform 150ms ease;
+  }
+  .fab:hover{ transform: scale(1.06); }
+  .fab:active{ transform: scale(0.95); }
+
+  /* Statut de révision */
+  .status-row{ display:flex; gap:10px; margin:18px 0; flex-wrap:wrap; }
+  .status-btn{ padding:8px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--paper);
+    color:var(--ink-soft); font-size:0.82rem; font-weight:600; cursor:pointer; transition:all 150ms ease; }
+  .status-btn.active.revoir{ background:#F0B429; color:#2B2019; border-color:#F0B429; }
+  .status-btn.active.maitrisee{ background:#3F8F5C; color:#FDF9F1; border-color:#3F8F5C; }
+  .status-dot{ display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:1px; }
+  .status-dot.revoir{ background:#F0B429; }
+  .status-dot.maitrisee{ background:#3F8F5C; }
+
+  /* Score de confiance */
+  .confidence-row{ display:flex; align-items:center; gap:8px; margin:18px 0; flex-wrap:wrap; }
+  .confidence-label{ font-size:0.82rem; color: var(--ink-soft); margin-right:2px; }
+  .confidence-btn{ width:32px; height:32px; border-radius:50%; border:1.5px solid var(--border); background: var(--paper);
+    color: var(--ink-soft); font-weight:700; font-size:0.85rem; cursor:pointer; transition: all 150ms ease; }
+  .confidence-btn.c1.active{ background:#A3342A; color:#fff; border-color:#A3342A; }
+  .confidence-btn.c2.active{ background:#C1452A; color:#fff; border-color:#C1452A; }
+  .confidence-btn.c3.active{ background:#B0821F; color:#fff; border-color:#B0821F; }
+  .confidence-btn.c4.active{ background:#7C9A5B; color:#fff; border-color:#7C9A5B; }
+  .confidence-btn.c5.active{ background:#3F8F5C; color:#fff; border-color:#3F8F5C; }
+  .conf-dot{ display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:1px; }
+  .due-badge{ font-size:0.72rem; background: var(--accent-soft); color: var(--accent); padding:3px 10px; border-radius:999px; font-weight:600; }
+  .subject-stats-table{ font-size:0.85rem; }
+  .subject-stats-table td, .subject-stats-table th{ padding:8px 10px; white-space:nowrap; }
+  .table-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -4px; padding:0 4px; }
+  .table-scroll table{ min-width:480px; }
+
+  /* Bannière d'annulation */
+  .undo-banner{
+    position:fixed; left:50%; transform:translateX(-50%); bottom:26px; background:var(--ink); color:var(--paper);
+    padding:12px 20px; border-radius:999px; font-size:0.85rem; display:flex; gap:14px; align-items:center;
+    box-shadow:0 8px 20px rgba(0,0,0,0.25); z-index:200; white-space:nowrap;
+  }
+  .undo-banner button{ background:var(--accent); color:#fff; border:none; padding:6px 14px; border-radius:999px;
+    font-weight:700; cursor:pointer; font-size:0.8rem; }
+
+  /* Indicateur hors-ligne */
+  .offline-banner{
+    background: var(--ink); color: var(--paper); text-align:center; padding:11px 16px;
+    font-size:0.85rem; font-weight:600;
+  }
+
+  /* Vue impression */
+  .print-fiche{ margin-bottom:32px; padding-bottom:24px; border-bottom:1px solid var(--border); }
+  .print-fiche h2{ font-family: var(--font-display); font-size:1.3rem; margin:0 0 10px; text-transform:uppercase; }
+  .print-content{ line-height:1.6; font-size:0.95rem; }
+
+  .md-content p{ margin:0 0 14px; }
+  .md-content ul{ margin:0 0 14px; padding-left:22px; }
+  .md-content li{ margin-bottom:6px; }
+  .md-content li::marker{ color: var(--accent); }
+  .md-content strong{
+    font-weight:700; color:#2B2019; padding:1px 6px; border-radius:3px;
+    box-decoration-break: clone; -webkit-box-decoration-break: clone;
+  }
+  .md-content strong.hl-0{ background: rgba(255,214,64,0.55); }
+  .md-content strong.hl-1{ background: rgba(139,209,125,0.5); }
+  .md-content strong.hl-2{ background: rgba(122,190,235,0.5); }
+  .md-content strong.hl-3{ background: rgba(240,145,190,0.5); }
+  [data-contrast="high"] .md-content strong{
+    background:none; color:inherit; padding:0; text-decoration:underline; text-decoration-thickness:2px;
+  }
+  .md-table{ border-collapse:collapse; width:100%; margin:0 0 16px; font-size:0.92rem; }
+  .md-table th, .md-table td{ border:1px solid var(--border); padding:8px 10px; text-align:left; }
+  .md-table th{ background: var(--paper); font-weight:700; }
+  .video-embed{ position:relative; width:100%; padding-top:56.25%; margin:16px 0; border-radius: var(--radius); overflow:hidden; background:#000; }
+  .video-embed iframe{ position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+  .print-img{ max-width:100%; margin-top:12px; border-radius:8px; display:block; }
+  .print-title{ font-size:1.8rem; margin-bottom:24px; }
+
+  /* Réorganisation des blocs d'accueil */
+  .home-block-wrap{ border:2px dashed var(--border); border-radius: var(--radius); padding:14px 14px 2px; margin-bottom:14px; cursor:grab; background: rgba(0,0,0,0.015); }
+  .home-block-wrap:active{ cursor:grabbing; }
+  .home-block-handle{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.6px; color: var(--ink-faint); margin-bottom:8px; font-weight:700; display:flex; align-items:center; gap:6px; }
+  .home-reorder-row{ margin: -8px 0 18px; }
+
+  /* Mode lecture minimal */
+  .reading-mode{ max-width:70ch; margin:0 auto; }
+  .reading-mode .fiche-content{ font-size:1.14rem; line-height:1.9; }
+  .reading-mode .fiche-title{ font-size:2.3rem; }
+
+  /* Badges */
+  .badge-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:12px; margin-top:6px; }
+  .badge-chip{ border:1.5px solid var(--border); border-radius: var(--radius); padding:14px; text-align:center; background: var(--paper); opacity:0.4; }
+  .badge-chip.unlocked{ opacity:1; border-color: var(--accent); background: var(--accent-soft); }
+  .badge-emoji{ font-size:1.7rem; line-height:1; }
+  .badge-name{ font-size:0.78rem; font-weight:700; margin-top:6px; }
+  .badge-desc{ font-size:0.68rem; color: var(--ink-faint); margin-top:2px; line-height:1.3; }
+
+  /* Nuage de mots-clés */
+  .word-cloud{ display:flex; flex-wrap:wrap; gap:10px 16px; align-items:baseline; }
+  .word-cloud-item{ font-weight:700; color: var(--accent); line-height:1; }
+
+  /* Compte à rebours de contrôle */
+  .exam-badge{ font-size:0.7rem; background:#A3342A; color:#fff; padding:2px 9px; border-radius:999px; font-weight:700; margin-left:8px; vertical-align:2px; }
+
+  /* Points / XP */
+  .xp-block .goal-text{ margin-top:8px; }
+
+  /* Confettis */
+  .confetti-container{ position:fixed; inset:0; pointer-events:none; z-index:500; overflow:hidden; }
+  .confetti-piece{ position:absolute; top:-20px; width:10px; height:14px; opacity:0.9; animation: confetti-fall 2.2s ease-in forwards; }
+  @keyframes confetti-fall{
+    0%{ transform: translateY(0) rotate(0deg); opacity:1; }
+    100%{ transform: translateY(105vh) rotate(360deg); opacity:0.35; }
+  }
+
+  /* Mode présentation à deux */
+  .presentation-mode{ max-width:900px; margin:0 auto; text-align:center; }
+  .presentation-progress{ font-size:0.8rem; color: var(--ink-faint); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+  .presentation-title{ font-size:2.6rem; margin:0 0 20px; }
+  .presentation-content{ font-size:1.35rem; line-height:1.85; text-align:left; background: var(--paper-card); border:1px solid var(--border);
+    border-radius: var(--radius); padding:36px 40px; box-shadow: var(--shadow); }
+  .presentation-nav{ display:flex; justify-content:center; gap:18px; margin-top:30px; }
+  .presentation-nav-btn{ padding:16px 30px; font-size:1.05rem; }
+  @media (max-width: 760px){
+    .presentation-title{ font-size:1.8rem; }
+    .presentation-content{ font-size:1.1rem; padding:22px 20px; }
+  }
+
+  /* Sélecteurs palette & police */
+  .palette-picker{ display:flex; gap:10px; flex-wrap:wrap; }
+  .palette-option{ width:38px; height:38px; border-radius:50%; cursor:pointer; border:2px solid transparent; display:flex; align-items:center; justify-content:center; }
+  .palette-option.selected{ border-color: var(--ink); }
+  .font-picker{ display:flex; gap:10px; flex-wrap:wrap; }
+  .font-option{ padding:10px 16px; border-radius:8px; border:1.5px solid var(--border); background: var(--paper); color: var(--ink); cursor:pointer; font-size:0.9rem; text-align:left; }
+  .font-option.selected{ border-color: var(--accent); color: var(--accent); }
+  .font-option .font-option-name{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.4px; opacity:0.7; display:block; margin-bottom:2px; }
+
+  @media print{
+    .rail, .fab, .no-print{ display:none !important; }
+    .layout{ display:block; }
+    .main{ padding:20px; max-width:100%; }
+    body{ background:#fff; color:#000; }
+    .print-fiche{ break-inside:avoid; }
+    .video-embed{ display:none; }
+    .fiche-detail{ box-shadow:none; }
+    .fiche-detail::before{ display:none; }
+    .md-content strong{ background:none !important; color:#000 !important; text-decoration:underline; padding:0; }
+  }
+
+  button:focus-visible, .tab:focus-visible, .subject-card:focus-visible, .fiche-card:focus-visible, .fab:focus-visible{
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+
+  @media (max-width: 760px){
+    .layout{ flex-direction:column; }
+    .rail{ width:100%; flex-direction:column; align-items:stretch; padding:12px 16px; border-right:none; border-bottom:1px solid var(--border); }
+    .rail-top{ display:block; margin-bottom:10px; }
+    .rail-brand-row{ margin-bottom:8px; }
+    .rail-collapse-btn{ display:none; }
+    .brand{ font-size:1.05rem; line-height:1; padding:0; white-space:nowrap; margin-bottom:0; }
+    .brand .script{ font-size:1.05rem; display:inline; margin-left:4px; margin-top:0; }
+    .rail-sub{ display:none; }
+    .rail-controls{ margin-bottom:8px; }
+    .rail-search{ flex:1; margin-bottom:0; }
+    .rail-search input{ padding:10px 12px; font-size:0.9rem; }
+    .rail-nav{ flex-direction:row; align-items:center; overflow-x:auto; gap:6px; -webkit-overflow-scrolling:touch; }
+    .home-row{ border-bottom:none; white-space:nowrap; margin-bottom:0; padding:10px 12px; flex-shrink:0; width:auto; }
+    .rail-subjects{ flex-direction:row; overflow-x:visible; flex:none; gap:6px; }
+    .tab{ width:auto; white-space:nowrap; border-bottom:none; padding:11px 12px; flex-shrink:0; }
+    .tab.active{ transform:none; }
+    .add-subject-btn{ margin-top:0; white-space:nowrap; flex-shrink:0; width:auto; }
+    .main{ padding: 28px 18px 96px; }
+    .doodle-corner{ display:none; }
+    h1.hero{ font-size:1.9rem; }
+    h1.hero .script{ font-size:1.6rem; }
+    .lede{ font-size:0.92rem; }
+    .stats-row{ gap:24px; margin-bottom:28px; }
+    .form-panel, .fiche-detail{ padding:22px 18px; }
+    .subject-header h1{ font-size:1.7rem; }
+    .form-actions{ flex-direction:column; }
+    .form-actions .btn{ width:100%; text-align:center; }
+    .fiche-actions{ flex-direction:column; }
+    .fiche-actions .btn{ width:100%; text-align:center; }
+    .manage-row{ flex-direction:column; align-items:stretch; }
+    .manage-actions{ width:100%; }
+    .manage-actions .btn{ flex:1; }
+    .fab{ bottom:20px; right:20px; }
+  }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const STORAGE_KEY = 'fiches-raphael-data';
+
+/* ---- Synchronisation cloud (facultative) ----
+   Désactivée par défaut. Pour l'activer, suis les instructions fournies à part (création
+   d'un projet Supabase gratuit), puis colle ton URL et ta clé "anon public" ci-dessous et
+   passe SYNC_ENABLED à true. Cette fois, tout se synchronise : le texte ET les photos/fichiers joints. */
+const SYNC_ENABLED = true;
+const SUPABASE_URL = 'https://gjhhksgzsprhidqmzqme.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_9NVioQzReAQo8S2Pda1a1g_vwSFk9QA';
+
+let sb = null;
+if(SYNC_ENABLED && SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase){
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+const DEFAULT_SUBJECTS = [
+  {id:'math-spe', name:'Maths spé',                 code:'MA+',  color:'#B8452A', textColor:'#FDF9F1', emoji:'📐'},
+  {id:'pc-spe',   name:'Physique-Chimie spé',        code:'PC+',  color:'#B8630B', textColor:'#FDF9F1', emoji:'⚛️'},
+  {id:'nsi',      name:'NSI',                        code:'NSI',  color:'#3F5D4E', textColor:'#FDF9F1', emoji:'💻'},
+  {id:'philo',    name:'Philosophie',                code:'PHIL', color:'#5E4256', textColor:'#FDF9F1', emoji:'🦉'},
+  {id:'hg',       name:'Histoire-Géographie',        code:'HG',   color:'#7A4A2E', textColor:'#FDF9F1', emoji:'🗺️'},
+  {id:'sci',      name:'Enseignement scientifique',  code:'SCI',  color:'#97701F', textColor:'#FDF9F1', emoji:'🔬'},
+  {id:'math',     name:'Mathématiques',               code:'MATH', color:'#9C5548', textColor:'#FDF9F1', emoji:'🔢'},
+  {id:'fr',       name:'Français',                    code:'FR',   color:'#6B2530', textColor:'#FDF9F1', emoji:'📖'},
+  {id:'ang',      name:'Anglais',                      code:'ANG',  color:'#85583A', textColor:'#FDF9F1', emoji:'🇬🇧'},
+  {id:'ita',      name:'Italien',                      code:'ITA',  color:'#5B6636', textColor:'#FDF9F1', emoji:'🇮🇹'},
+  {id:'lat',      name:'Latin',                        code:'LAT',  color:'#5C4F44', textColor:'#FDF9F1', emoji:'🏛️'}
+];
+
+const PALETTES = [
+  {id:'terracotta', name:'Terracotta (actuel)', swatch:'#C1452A'},
+  {id:'sauge',      name:'Sauge',                swatch:'#5F7A52'},
+  {id:'lavande',    name:'Lavande',               swatch:'#6B4E71'},
+  {id:'ocean',      name:'Océan',                 swatch:'#2C6E8E'}
+];
+const FONT_PAIRINGS = [
+  {id:'chaleureux', name:'Chaleureux (actuel)', display:"'Anton', sans-serif",        script:"'Parisienne', cursive", body:"'Poppins', system-ui, sans-serif"},
+  {id:'classique',  name:'Classique',            display:"'Playfair Display', serif",  script:"'Caveat', cursive",     body:"'Lora', serif"},
+  {id:'moderne',    name:'Moderne',               display:"'Space Grotesk', sans-serif", script:"'Caveat', cursive",    body:"'Space Grotesk', sans-serif"}
+];
+
+const SWATCHES = ['#B8452A','#B8630B','#3F5D4E','#5E4256','#7A4A2E','#97701F','#6E7C4A','#5C4F44'];
+
+let data = { subjects: DEFAULT_SUBJECTS.map(s=>({...s})), fiches: [] };
+let state = { view: 'home' };
+let dataLoaded = false;
+let lastSubjectId = null;
+let pickedColor = SWATCHES[0];
+let pendingAttachments = [];
+let syncStatus = 'idle';
+let lastDeleted = null;
+let mergePanelOpen = false;
+function toggleMergePanel(){ mergePanelOpen = !mergePanelOpen; render(); }
+
+function esc(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function migrateAttachments(f){
+  if(!f) return [];
+  if(Array.isArray(f.attachments)) return f.attachments;
+  if(f.attachment) return [f.attachment];
+  return [];
+}
+function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+
+function inlineFormat(s, hl){
+  return s.replace(/\*\*(.+?)\*\*/g, (m, inner) => {
+    const cls = hl ? ` class="hl-${hl.n++ % 4}"` : '';
+    return `<strong${cls}>${inner}</strong>`;
+  });
+}
+function isTableRow(line){ return /^\s*\|.*\|\s*$/.test(line); }
+function isTableSep(line){ return /^\s*\|?[\s:|-]+\|?\s*$/.test(line) && line.includes('-'); }
+
+function renderMarkdownLite(text){
+  const escaped = esc(text);
+  const lines = escaped.split('\n');
+  const hl = { n: 0 };
+  let html = '';
+  let inList = false;
+  const flushList = () => { if(inList){ html += '</ul>'; inList = false; } };
+  let i = 0;
+  while(i < lines.length){
+    const line = lines[i];
+    const ytMatch = line.trim().match(/^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})\S*$/i);
+    if(ytMatch){
+      flushList();
+      html += `<div class="video-embed"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" title="Vidéo YouTube" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`;
+      i++; continue;
+    }
+    if(isTableRow(line) && i+1<lines.length && isTableSep(lines[i+1])){
+      flushList();
+      const rows = [line];
+      i += 2;
+      while(i<lines.length && isTableRow(lines[i])){ rows.push(lines[i]); i++; }
+      html += '<table class="md-table">' + rows.map((row,idx)=>{
+        const cells = row.trim().replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+        const tag = idx===0 ? 'th' : 'td';
+        return '<tr>' + cells.map(c=>`<${tag}>${inlineFormat(c, hl)}</${tag}>`).join('') + '</tr>';
+      }).join('') + '</table>';
+      continue;
+    }
+    if(/^\s*[-*]\s+/.test(line)){
+      if(!inList){ html += '<ul>'; inList = true; }
+      html += '<li>' + inlineFormat(line.replace(/^\s*[-*]\s+/, ''), hl) + '</li>';
+      i++; continue;
+    }
+    flushList();
+    if(line.trim() !== ''){ html += '<p>' + inlineFormat(line, hl) + '</p>'; }
+    i++;
+  }
+  flushList();
+  return html;
+}
+
+function renderMathIn(selector){
+  if(!window.renderMathInElement) return;
+  document.querySelectorAll(selector).forEach(el=>{
+    try{
+      renderMathInElement(el, {
+        delimiters: [
+          {left:'$$', right:'$$', display:true},
+          {left:'$', right:'$', display:false}
+        ],
+        throwOnError:false
+      });
+    }catch(e){}
+  });
+}
+function fmtDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('fr-FR', {day:'numeric', month:'short', year:'numeric'});
+}
+function getSubject(id){ return data.subjects.find(s=>s.id===id); }
+function getFiche(id){ return data.fiches.find(f=>f.id===id); }
+function fichesOf(subjectId){ return data.fiches.filter(f=>f.subjectId===subjectId).sort((a,b)=> b.dateAdded.localeCompare(a.dateAdded)); }
+
+// ---------- Score de confiance & répétition espacée ----------
+const REVIEW_INTERVALS = {1:1, 2:3, 3:7, 4:14, 5:30}; // jours avant la prochaine révision suggérée
+function confidenceColor(n){
+  return {1:'#A3342A',2:'#C1452A',3:'#B0821F',4:'#7C9A5B',5:'#3F8F5C'}[n] || null;
+}
+function isDueForReview(f){
+  if(f.confidence === undefined) return true;
+  if(!f.nextReview) return true;
+  return new Date(f.nextReview) <= new Date();
+}
+function migrateFicheStatus(f){
+  if(f.status && f.confidence===undefined){
+    f.confidence = f.status==='a-revoir' ? 1 : 5;
+    const days = REVIEW_INTERVALS[f.confidence] || 7;
+    const next = new Date(); next.setDate(next.getDate()+days);
+    f.nextReview = next.toISOString();
+  }
+  delete f.status;
+}
+// ---------- Points / XP ----------
+let xpTotal = 0;
+function initXP(){
+  try{ xpTotal = parseInt(localStorage.getItem('xp-total'),10) || 0; }catch(e){}
+}
+function addXP(amount){
+  xpTotal += amount;
+  try{ localStorage.setItem('xp-total', String(xpTotal)); }catch(e){}
+}
+function xpLevel(){ return Math.floor(xpTotal/100) + 1; }
+function xpProgressInLevel(){ return xpTotal % 100; }
+
+// ---------- Maîtrise complète d'une matière (pour les confettis) ----------
+function isSubjectFullyMastered(subjectId){
+  const fs = fichesOf(subjectId);
+  return fs.length>0 && fs.every(f=>f.confidence!==undefined && f.confidence>=4);
+}
+
+// ---------- Confettis ----------
+function triggerConfetti(){
+  if(prefersReducedMotion()) return;
+  const colors = ['#C1452A','#F0B429','#3F8F5C','#2C6E8E','#6B4E71'];
+  const container = document.createElement('div');
+  container.className = 'confetti-container no-print';
+  for(let i=0;i<40;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = (Math.random()*100)+'vw';
+    piece.style.background = colors[i%colors.length];
+    piece.style.animationDelay = (Math.random()*0.4)+'s';
+    piece.style.transform = `rotate(${Math.random()*360}deg)`;
+    container.appendChild(piece);
+  }
+  document.body.appendChild(container);
+  setTimeout(()=>{ container.remove(); }, 2600);
+}
+
+async function setConfidence(id, level){
+  const f = getFiche(id);
+  if(!f) return;
+  const subjectId = f.subjectId;
+  const wasFullyMastered = isSubjectFullyMastered(subjectId);
+  if(f.confidence === level){
+    f.confidence = undefined;
+    f.nextReview = undefined;
+  }else{
+    f.confidence = level;
+    f.reviewCount = (f.reviewCount||0) + 1;
+    addXP(3);
+    const days = REVIEW_INTERVALS[level] || 7;
+    const next = new Date(); next.setDate(next.getDate()+days);
+    f.nextReview = next.toISOString();
+  }
+  vibrate(15);
+  await saveData();
+  render();
+  if(!wasFullyMastered && isSubjectFullyMastered(subjectId)){
+    triggerConfetti();
+  }
+}
+function confidenceRowHtml(f){
+  return `<div class="confidence-row">
+    <span class="confidence-label">Confiance :</span>
+    ${[1,2,3,4,5].map(n=>`<button class="confidence-btn c${n} ${f.confidence===n?'active':''}" onclick="setConfidence('${f.id}',${n})" title="${n}/5">${n}</button>`).join('')}
+    ${isDueForReview(f) ? '<span class="due-badge">⏰ à revoir</span>' : ''}
+  </div>`;
+}
+
+let currentSort = 'date-desc';
+let currentFilter = 'all';
+function setSort(v){ currentSort = v; render(); }
+function setFilter(v){ currentFilter = v; render(); }
+
+function applyFilterSort(list){
+  let out = list;
+  if(currentFilter==='a-revoir') out = out.filter(f=> isDueForReview(f));
+  else if(currentFilter==='maitrisee') out = out.filter(f=> f.confidence!==undefined && f.confidence>=4);
+  else if(currentFilter==='sans-statut') out = out.filter(f=> f.confidence===undefined);
+  const confRank = f => f.confidence===undefined ? 3 : f.confidence;
+  if(currentSort==='date-asc') out = [...out].sort((a,b)=> a.dateAdded.localeCompare(b.dateAdded));
+  else if(currentSort==='title-asc') out = [...out].sort((a,b)=> a.title.localeCompare(b.title,'fr'));
+  else if(currentSort==='title-desc') out = [...out].sort((a,b)=> b.title.localeCompare(a.title,'fr'));
+  else if(currentSort==='status') out = [...out].sort((a,b)=> confRank(a)-confRank(b));
+  else if(currentSort==='manuel'){ /* garde l'ordre du tableau data.fiches, ne trie pas */ }
+  else out = [...out].sort((a,b)=> (b.dateEdited||b.dateAdded).localeCompare(a.dateEdited||a.dateAdded));
+  const pinned = out.filter(f=>f.pinned);
+  const rest = out.filter(f=>!f.pinned);
+  return [...pinned, ...rest];
+}
+function visibleFichesOf(subjectId){
+  return applyFilterSort(data.fiches.filter(f=>f.subjectId===subjectId));
+}
+function groupByChapter(list){
+  const groups = new Map();
+  list.forEach(f=>{
+    const key = (f.chapter && f.chapter.trim()) ? f.chapter.trim() : '__none__';
+    if(!groups.has(key)) groups.set(key, { label: key==='__none__' ? 'Sans chapitre' : key, fiches: [] });
+    groups.get(key).fiches.push(f);
+  });
+  const entries = [...groups.entries()];
+  const named = entries.filter(([k])=>k!=='__none__').map(([,v])=>v);
+  const none = groups.get('__none__');
+  return none ? [...named, none] : named;
+}
+
+function renderFicheCard(f, opts){
+  opts = opts || {};
+  const preview = esc(f.content).slice(0,140);
+  const atts = migrateAttachments(f);
+  const attachIcon = atts.length ? (atts.some(a=>a.type==='image') ? ' 🖼️' : atts.some(a=>a.type==='audio') ? ' 🎤' : ' 📎') : '';
+  const confDot = f.confidence !== undefined ? `<span class="conf-dot" style="background:${confidenceColor(f.confidence)}" title="Confiance ${f.confidence}/5"></span>` : '';
+  const pin = f.pinned ? '📌 ' : '';
+  let dateLine = fmtDate(f.dateAdded);
+  if(opts.showSubject){ const s = getSubject(f.subjectId); dateLine = (s ? esc(s.name)+' · ' : '') + dateLine; }
+  const seen = timeAgo(f.lastViewed);
+  if(seen) dateLine += ' · ' + seen;
+  const tagsHtml = (f.tags && f.tags.length) ? `<div class="card-tags">${f.tags.map(t=>`<span class="tag-chip-mini">${esc(t)}</span>`).join('')}</div>` : '';
+  const draggable = currentSort==='manuel' ? `draggable="true" ondragstart="handleFicheDragStart('${f.id}')" ondragover="handleFicheDragOver(event)" ondrop="handleFicheDrop(event,'${f.id}')"` : '';
+  return `<div class="fiche-card" data-fiche-id="${f.id}" ${draggable} tabindex="0" onclick="openFiche('${f.id}')" onkeypress="if(event.key==='Enter') openFiche('${f.id}')">
+    <div class="title">${pin}${confDot}${esc(f.title)}${attachIcon}</div>
+    <div class="date">${dateLine}</div>
+    <div class="preview">${preview}</div>
+    ${tagsHtml}
+  </div>`;
+}
+function subjectIndex(id){ return data.subjects.findIndex(s=>s.id===id); }
+function pad2(n){ return String(n).padStart(2,'0'); }
+function activeSubjects(){ return data.subjects.filter(s=>!s.archived); }
+function activeRank(id){ return activeSubjects().findIndex(s=>s.id===id); }
+
+// ---------- Compte à rebours avant contrôle ----------
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const target = new Date(dateStr); target.setHours(0,0,0,0);
+  return Math.round((target-now)/86400000);
+}
+function examBadgeLabel(days){
+  if(days === null) return '';
+  if(days > 0) return `J-${days}`;
+  if(days === 0) return "Aujourd'hui";
+  return `Il y a ${Math.abs(days)} j`;
+}
+function subjectsWithUpcomingExam(maxDays){
+  return activeSubjects().filter(s=>{
+    const d = daysUntil(s.examDate);
+    return d !== null && d >= 0 && d <= maxDays;
+  }).sort((a,b)=> daysUntil(a.examDate) - daysUntil(b.examDate));
+}
+
+// ---------- Nuage de mots-clés ----------
+const FRENCH_STOPWORDS = new Set(['le','la','les','de','des','du','un','une','et','en','a','au','aux','ce','ces',
+  'cette','cet','que','qui','quoi','pour','par','sur','dans','est','sont','etre','avoir','avec','ou','mais','donc',
+  'ne','pas','se','sa','son','ses','on','il','elle','ils','elles','nous','vous','je','tu','plus','moins','comme',
+  'si','tout','tous','toute','toutes','entre','sans','sous','vers','chez','deux','trois','cela','ca','fait','faire',
+  'peut','peuvent','ainsi','alors','lorsque','quand','ou','dont','leur','leurs','notre','nos','votre','vos','etait',
+  'etaient','ete','apres','avant','the','and','for'
+]);
+function wordFrequency(subjectId){
+  const fs = fichesOf(subjectId);
+  const counts = new Map();
+  fs.forEach(f=>{
+    const text = String(f.title+' '+f.content).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const words = text.match(/[a-z]{3,}/g) || [];
+    words.forEach(w=>{
+      if(FRENCH_STOPWORDS.has(w)) return;
+      counts.set(w, (counts.get(w)||0)+1);
+    });
+  });
+  return Array.from(counts.entries()).sort((a,b)=>b[1]-a[1]).slice(0,30);
+}
+function renderWordCloud(subjectId){
+  const freq = wordFrequency(subjectId);
+  if(!freq.length) return `<p style="font-size:0.85rem; color:var(--ink-faint);">Pas encore assez de contenu pour un nuage de mots-clés.</p>`;
+  const max = freq[0][1];
+  return `<div class="word-cloud">${freq.map(([w,c])=>{
+    const size = (0.78 + (c/max)*1.3).toFixed(2);
+    const opacity = (0.55 + (c/max)*0.45).toFixed(2);
+    return `<span class="word-cloud-item" style="font-size:${size}rem; opacity:${opacity};" title="${c} occurrence${c===1?'':'s'}">${esc(w)}</span>`;
+  }).join('')}</div>`;
+}
+
+// ---------- Astuce du jour ----------
+const DAILY_TIPS = [
+  "La répétition espacée fonctionne mieux si tu es honnête avec ton score de confiance : ne mets pas 5 par confort.",
+  "Explique un concept à voix haute, sans regarder tes notes : c'est le meilleur test de ce que tu maîtrises vraiment.",
+  "Une session de 25 minutes bien concentrée vaut mieux qu'une heure distraite avec le téléphone à côté.",
+  "Reformule une fiche avec tes propres mots plutôt que de la relire passivement : ça ancre bien mieux la mémoire.",
+  "Avant de commencer à réviser, relis d'abord les titres de tes fiches : ça réactive ce que tu sais déjà.",
+  "Une fiche trop longue est souvent le signe qu'il faudrait la découper en plusieurs chapitres.",
+  "Se tester avec le mode quiz avant de relire le contenu t'aide à repérer précisément ce qui te manque.",
+  "Dormir suffisamment la nuit avant un contrôle aide autant que réviser une heure de plus.",
+  "Réviser un peu chaque jour bat toujours une grosse session la veille d'un contrôle.",
+  "Change de matière toutes les 25-30 minutes : ça garde l'attention plus fraîche qu'une longue session sur un seul sujet.",
+  "Une fiche avec un exemple concret se retient mieux qu'une fiche uniquement théorique.",
+  "Si une fiche revient souvent en « à revoir », essaie de la refaire entièrement plutôt que de la relire une fois de plus.",
+  "Note tes sources sur chaque fiche : ça te fait gagner un temps précieux si tu dois vérifier un détail plus tard.",
+  "Le mode présentation à deux est idéal pour se tester mutuellement à l'oral avant un contrôle.",
+  "Fixe-toi un petit objectif de fiches par semaine plutôt que de réviser au hasard.",
+  "Une pause de 5 minutes toutes les 25 minutes améliore la concentration sur la session suivante.",
+  "Relire une fiche juste avant de dormir aide à mieux la consolider en mémoire pendant la nuit.",
+  "Écrire un résumé d'une fiche en une seule phrase t'oblige à identifier l'essentiel.",
+  "Range tes fiches par chapitre dès la création : tu gagneras du temps à chaque révision future.",
+  "Une bonne fiche répond à la question « qu'est-ce que je dois absolument retenir ? » en quelques lignes.",
+  "Teste-toi avant de relire, pas après : l'effort de rappel renforce la mémorisation bien plus que la relecture.",
+  "Un petit rituel avant de réviser (même juste ranger son bureau) aide à démarrer plus facilement.",
+  "Prioriser les matières les moins maîtrisées d'abord, quand ta concentration est la plus fraîche.",
+  "Utiliser des exemples différents de ceux du cours pour vérifier que tu as vraiment compris, pas juste mémorisé.",
+  "Réviser à voix haute engage plus de mémoire (auditive et articulatoire) que réviser en silence."
+];
+function tipOfTheDay(){
+  const today = new Date().toISOString().slice(0,10);
+  let hash = 0;
+  for(let i=0;i<today.length;i++){ hash = (hash*31 + today.charCodeAt(i)) >>> 0; }
+  return DAILY_TIPS[hash % DAILY_TIPS.length];
+}
+
+// ---------- Sélection du soir ----------
+function eveningSelection(){
+  const byLength = arr => [...arr].sort((a,b)=> (a.content||'').length - (b.content||'').length);
+  const due = data.fiches.filter(f=>isDueForReview(f));
+  let picks = byLength(due).slice(0,3);
+  if(picks.length < 3){
+    const usedIds = new Set(picks.map(f=>f.id));
+    const rest = byLength(data.fiches.filter(f=>!usedIds.has(f.id)));
+    picks = picks.concat(rest.slice(0, 3-picks.length));
+  }
+  return picks;
+}
+
+// ---------- Glisser-déposer des fiches (tri manuel) ----------
+let dragFicheId = null;
+function handleFicheDragStart(id){ dragFicheId = id; }
+function handleFicheDragOver(ev){ ev.preventDefault(); }
+async function handleFicheDrop(ev, targetId){
+  ev.preventDefault();
+  if(!dragFicheId || dragFicheId===targetId){ dragFicheId=null; return; }
+  const fromIdx = data.fiches.findIndex(f=>f.id===dragFicheId);
+  const toIdx = data.fiches.findIndex(f=>f.id===targetId);
+  dragFicheId = null;
+  if(fromIdx<0 || toIdx<0) return;
+  const [moved] = data.fiches.splice(fromIdx,1);
+  data.fiches.splice(toIdx,0,moved);
+  await saveData();
+  render();
+}
+
+// ---------- Archivage d'une matière ----------
+async function toggleArchiveSubject(id){
+  const s = getSubject(id);
+  if(!s) return;
+  s.archived = !s.archived;
+  await saveData();
+  render();
+}
+
+// ---------- Étiquettes ----------
+function allTags(){
+  const set = new Set();
+  data.fiches.forEach(f=> (f.tags||[]).forEach(t=>set.add(t)));
+  return Array.from(set).sort((a,b)=>a.localeCompare(b,'fr'));
+}
+function openTagView(tag){ state = { view: {type:'tag', tag} }; render(); }
+function renderTagView(tag){
+  const list = data.fiches.filter(f=> (f.tags||[]).some(t=>t.toLowerCase()===tag.toLowerCase()));
+  const cardsHtml = list.map(f=>renderFicheCard(f,{showSubject:true})).join('');
+  return `
+    <p class="eyebrow">Étiquette</p>
+    <h1 class="hero" style="font-size:2rem;">🏷️ ${esc(tag)}</h1>
+    ${list.length ? `<div class="grid" style="margin-top:26px;">${cardsHtml}</div>` : `<div class="empty-state" style="margin-top:26px;"><p>Aucune fiche avec cette étiquette.</p></div>`}
+  `;
+}
+
+// ---------- Fusionner deux fiches ----------
+async function mergeFicheInto(sourceId, targetId){
+  const source = getFiche(sourceId);
+  const target = getFiche(targetId);
+  if(!source || !target || source.id===target.id) return;
+  if(!confirm(`Fusionner « ${source.title} » dans « ${target.title} » ? La fiche « ${source.title} » sera supprimée après fusion.`)) return;
+  target.content = target.content + '\n\n---\n\n**' + source.title + '**\n' + source.content;
+  target.dateEdited = new Date().toISOString();
+  data.fiches = data.fiches.filter(f=>f.id!==source.id);
+  await saveData();
+  openFiche(target.id);
+}
+function renderAttachmentsGallery(f){
+  const atts = migrateAttachments(f);
+  if(!atts.length) return '';
+  return `<div class="fiche-attachments">${atts.map(a=>{
+    const src = a.url || a.dataUrl;
+    if(a.type==='image') return `<div class="fiche-attachment"><img src="${src}" alt=""></div>`;
+    if(a.type==='audio') return `<div class="fiche-attachment"><audio controls src="${src}"></audio></div>`;
+    return `<div class="fiche-attachment"><a href="${src}" target="_blank" rel="noopener" download="${esc(a.name)}" class="btn ghost small">📎 ${esc(a.name)} — Ouvrir / Télécharger</a></div>`;
+  }).join('')}</div>`;
+}
+function splitTitleContent(raw){
+  const lines = raw.split('\n');
+  const title = (lines[0] || '').trim().slice(0,120) || 'Sans titre';
+  const rest = lines.slice(1).join('\n').trim();
+  return { title, content: rest || raw.trim() };
+}
+function mostRecentFiche(){
+  if(!data.fiches.length) return null;
+  return [...data.fiches].sort((a,b)=> (b.dateEdited||b.dateAdded).localeCompare(a.dateEdited||a.dateAdded))[0];
+}
+function toSyncPayload(d){
+  // On n'envoie jamais le dataUrl (trop lourd) : seulement la référence en ligne (url),
+  // une fois que la pièce jointe a été effectivement mise en ligne sur Supabase Storage.
+  return {
+    subjects: d.subjects,
+    fiches: d.fiches.map(f=>{
+      const { attachment, attachments, ...rest } = f;
+      const list = migrateAttachments(f).filter(a=>a.url).map(a=>({type:a.type, name:a.name, mime:a.mime, url:a.url}));
+      return list.length ? { ...rest, attachments: list } : rest;
+    })
+  };
+}
+
+// ---------- Stockage local + cloud (Supabase) ----------
+async function cloudLoad(){
+  if(!sb) return null;
+  try{
+    const { data: row, error } = await sb.from('app_data').select('payload').eq('id', 1).maybeSingle();
+    if(error || !row) return null;
+    return row.payload || null;
+  }catch(e){ console.log('Sync cloud indisponible', e); return null; }
+}
+
+async function cloudSave(payload){
+  if(!sb) return;
+  try{
+    const { error } = await sb.from('app_data').upsert({ id: 1, payload });
+    setSyncStatus(error ? 'offline' : 'ok');
+  }catch(e){
+    console.log('Sync cloud impossible pour le moment', e);
+    setSyncStatus('offline');
+  }
+}
+
+async function uploadAttachmentsIfNeeded(fiche){
+  if(!sb) return;
+  const list = migrateAttachments(fiche);
+  if(!list.length) return;
+  for(const att of list){
+    if(att.url || !att.dataUrl) continue;
+    try{
+      const res = await fetch(att.dataUrl);
+      const blob = await res.blob();
+      const ext = (att.mime && att.mime.split('/')[1]) || 'bin';
+      const path = `${fiche.id}-${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;
+      const { error } = await sb.storage.from('attachments').upload(path, blob, { contentType: att.mime, upsert: true });
+      if(error){ console.log('Upload pièce jointe échoué', error); continue; }
+      const { data: pub } = sb.storage.from('attachments').getPublicUrl(path);
+      att.url = pub.publicUrl;
+    }catch(e){ console.log('Upload pièce jointe impossible', e); }
+  }
+  fiche.attachments = list;
+  delete fiche.attachment;
+}
+
+function setSyncStatus(s){ syncStatus = s; if(state.view==='home') render(); }
+
+function syncBadgeLabel(){
+  if(!SYNC_ENABLED) return 'Synchronisation cloud : désactivée';
+  if(syncStatus==='ok') return '☁️ Synchronisé';
+  if(syncStatus==='offline') return '📴 Hors-ligne (sauvegardé sur cet appareil)';
+  return 'Synchronisation cloud activée';
+}
+
+async function checkConnection(){
+  const el = document.getElementById('connection-check-result');
+  if(el) el.textContent = 'Vérification en cours…';
+  if(!sb){
+    if(el) el.textContent = 'Synchronisation cloud désactivée — rien à vérifier.';
+    return;
+  }
+  try{
+    const { error } = await sb.from('app_data').select('id').eq('id',1).maybeSingle();
+    if(el) el.textContent = error ? ('❌ Connexion impossible : ' + (error.message || 'vérifie ta configuration Supabase.')) : '✅ Connexion réussie, la synchronisation fonctionne.';
+  }catch(e){
+    if(el) el.textContent = '❌ Connexion impossible (hors-ligne, ou erreur réseau).';
+  }
+}
+
+// ---------- Jauge d'utilisation du stockage Supabase ----------
+// Limite du plan gratuit Supabase au moment de l'écriture de ce code : 1 Go de stockage fichiers
+// (à ne pas confondre avec les 500 Mo de base de données). Si Supabase change cette limite,
+// ce chiffre affiché ici deviendra approximatif.
+const SUPABASE_FREE_STORAGE_MB = 1024;
+async function checkStorageUsage(){
+  const el = document.getElementById('storage-usage-result');
+  if(el) el.textContent = 'Calcul en cours…';
+  if(!sb){
+    if(el) el.textContent = 'Synchronisation cloud désactivée — jauge indisponible.';
+    return;
+  }
+  try{
+    const { data: files, error } = await sb.storage.from('attachments').list('', { limit: 1000 });
+    if(error || !files){
+      if(el) el.textContent = "Impossible de récupérer l'utilisation du stockage pour le moment.";
+      return;
+    }
+    const totalBytes = files.reduce((sum,f)=> sum + ((f.metadata && f.metadata.size) || 0), 0);
+    const usedMb = totalBytes/1024/1024;
+    const pct = Math.min(100, Math.round(usedMb/SUPABASE_FREE_STORAGE_MB*100));
+    if(el) el.innerHTML = `
+      <div class="goal-bar-track" style="margin-top:8px;"><div class="goal-bar-fill" style="width:${pct}%"></div></div>
+      <div class="goal-text" style="margin-top:6px;">${usedMb.toFixed(1)} Mo utilisés sur ${SUPABASE_FREE_STORAGE_MB} Mo (plan gratuit Supabase) · ${files.length} fichier${files.length===1?'':'s'}</div>
+    `;
+  }catch(e){
+    if(el) el.textContent = "Impossible de récupérer l'utilisation du stockage (hors-ligne ou erreur réseau).";
+  }
+}
+
+// ---------- Détection d'anomalies ----------
+function detectAnomalies(){
+  const issues = [];
+  const subjectIds = new Set(data.subjects.map(s=>s.id));
+  const ficheIds = new Set(data.fiches.map(f=>f.id));
+  const seenTitles = new Map();
+  data.fiches.forEach(f=>{
+    const label = (f.title && f.title.trim()) ? f.title : '(sans titre)';
+    if(!subjectIds.has(f.subjectId)){
+      issues.push(`La fiche « ${label} » appartient à une matière qui n'existe plus.`);
+    }
+    if(!f.title || !f.title.trim()){
+      issues.push(`Une fiche sans titre a été trouvée (id ${f.id}).`);
+    }
+    if(!f.content || !f.content.trim()){
+      issues.push(`La fiche « ${label} » n'a pas de contenu.`);
+    }
+    (f.links||[]).forEach(lid=>{
+      if(!ficheIds.has(lid)) issues.push(`La fiche « ${label} » a un lien « voir aussi » vers une fiche supprimée.`);
+    });
+    migrateAttachments(f).forEach(a=>{
+      if(!a.url && !a.dataUrl) issues.push(`La fiche « ${label} » a une pièce jointe sans données (probablement corrompue).`);
+    });
+    if(subjectIds.has(f.subjectId)){
+      const key = f.subjectId + '::' + label.trim().toLowerCase();
+      if(seenTitles.has(key)) issues.push(`Doublon possible : deux fiches nommées « ${label} » dans la même matière.`);
+      else seenTitles.set(key, true);
+    }
+  });
+  return issues;
+}
+let anomalyCheckResults = null;
+function runAnomalyCheck(){
+  anomalyCheckResults = detectAnomalies();
+  render();
+}
+
+async function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(parsed && Array.isArray(parsed.subjects) && Array.isArray(parsed.fiches)) data = parsed;
+    }
+  }catch(e){
+    // Rien de valide en local : on garde les valeurs par défaut.
+  }
+
+  const cloud = await cloudLoad();
+  if(cloud && Array.isArray(cloud.subjects) && Array.isArray(cloud.fiches)){
+    const localFichesById = new Map(data.fiches.map(f=>[f.id,f]));
+    const mergedSubjectsById = new Map(data.subjects.map(s=>[s.id,s]));
+    cloud.subjects.forEach(s => mergedSubjectsById.set(s.id, s));
+    const mergedFichesById = new Map();
+    cloud.fiches.forEach(cf => {
+      const local = localFichesById.get(cf.id);
+      const cloudAtts = migrateAttachments(cf);
+      const localAtts = migrateAttachments(local);
+      let merged = cf;
+      if(cloudAtts.length || localAtts.length){
+        const mergedAtts = cloudAtts.map(ca=>{
+          const match = localAtts.find(la=> !la.url && la.name===ca.name && la.mime===ca.mime);
+          return match ? { ...ca, dataUrl: match.dataUrl } : ca;
+        });
+        localAtts.forEach(la=>{
+          if(!la.url && !mergedAtts.some(ma=>ma.dataUrl===la.dataUrl)) mergedAtts.push(la);
+        });
+        merged = { ...cf };
+        delete merged.attachment;
+        merged.attachments = mergedAtts;
+      }
+      mergedFichesById.set(cf.id, merged);
+    });
+    data.fiches.forEach(lf => { if(!mergedFichesById.has(lf.id)) mergedFichesById.set(lf.id, lf); });
+    data = { subjects: Array.from(mergedSubjectsById.values()), fiches: Array.from(mergedFichesById.values()) };
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+  }
+
+  data.fiches.forEach(migrateFicheStatus);
+  dataLoaded = true;
+  render();
+
+  if(sb){
+    for(const f of data.fiches){ await uploadAttachmentsIfNeeded(f); }
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+    cloudSave(toSyncPayload(data));
+  }
+}
+
+async function saveData(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }catch(e){
+    console.error('Erreur de sauvegarde', e);
+    alert("La sauvegarde a échoué (stockage local plein ou bloqué par le navigateur).");
+  }
+  if(sb){
+    for(const f of data.fiches){ await uploadAttachmentsIfNeeded(f); }
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){}
+  }
+  cloudSave(toSyncPayload(data));
+}
+
+// ---------- Navigation ----------
+function goHome(){ state = { view:'home' }; render(); }
+
+function initTheme(){
+  let theme = 'light';
+  try{
+    theme = localStorage.getItem('theme-pref') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }catch(e){}
+  document.documentElement.setAttribute('data-theme', theme);
+}
+function toggleTheme(){
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try{ localStorage.setItem('theme-pref', next); }catch(e){}
+  render();
+}
+
+// ---------- Palette de couleurs ----------
+let palettePref = 'terracotta';
+function initPalette(){
+  try{ palettePref = localStorage.getItem('palette-pref') || 'terracotta'; }catch(e){}
+  document.documentElement.setAttribute('data-palette', palettePref);
+}
+function setPalette(id){
+  palettePref = id;
+  document.documentElement.setAttribute('data-palette', id);
+  try{ localStorage.setItem('palette-pref', id); }catch(e){}
+  render();
+}
+
+// ---------- Contraste élevé ----------
+let highContrast = false;
+function initHighContrast(){
+  try{ highContrast = localStorage.getItem('high-contrast-pref')==='1'; }catch(e){}
+  document.documentElement.setAttribute('data-contrast', highContrast ? 'high' : 'normal');
+}
+function toggleHighContrast(){
+  highContrast = !highContrast;
+  document.documentElement.setAttribute('data-contrast', highContrast ? 'high' : 'normal');
+  try{ localStorage.setItem('high-contrast-pref', highContrast?'1':'0'); }catch(e){}
+  render();
+}
+
+// ---------- Réduire les animations (interrupteur manuel) ----------
+let reduceMotionPref = false;
+function initReduceMotion(){
+  try{ reduceMotionPref = localStorage.getItem('reduce-motion-pref')==='1'; }catch(e){}
+  document.documentElement.setAttribute('data-reduce-motion', reduceMotionPref ? '1' : '0');
+}
+function toggleReduceMotion(){
+  reduceMotionPref = !reduceMotionPref;
+  document.documentElement.setAttribute('data-reduce-motion', reduceMotionPref ? '1' : '0');
+  try{ localStorage.setItem('reduce-motion-pref', reduceMotionPref?'1':'0'); }catch(e){}
+  render();
+}
+function prefersReducedMotion(){
+  if(reduceMotionPref) return true;
+  try{ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){ return false; }
+}
+
+// ---------- Indicateur hors-ligne ----------
+let isOnline = true;
+function initOnlineStatus(){
+  try{ isOnline = navigator.onLine; }catch(e){ isOnline = true; }
+  try{
+    window.addEventListener('online', ()=>{ isOnline = true; render(); });
+    window.addEventListener('offline', ()=>{ isOnline = false; render(); });
+  }catch(e){}
+}
+function renderOfflineBanner(){
+  if(isOnline && syncStatus!=='offline') return '';
+  return `<div class="offline-banner no-print">📴 Tu es hors-ligne — tes changements se synchroniseront automatiquement à la reconnexion.</div>`;
+}
+
+// ---------- Choix de police ----------
+let fontPref = 'chaleureux';
+function applyFontPairing(id){
+  const p = FONT_PAIRINGS.find(x=>x.id===id) || FONT_PAIRINGS[0];
+  document.documentElement.style.setProperty('--font-display', p.display);
+  document.documentElement.style.setProperty('--font-script', p.script);
+  document.documentElement.style.setProperty('--font-body', p.body);
+}
+function initFontPairing(){
+  try{ fontPref = localStorage.getItem('font-pairing-pref') || 'chaleureux'; }catch(e){}
+  applyFontPairing(fontPref);
+}
+function setFontPairing(id){
+  fontPref = id;
+  applyFontPairing(id);
+  try{ localStorage.setItem('font-pairing-pref', id); }catch(e){}
+  render();
+}
+
+// ---------- Taille de texte ----------
+let fontSizePref = 100;
+function initFontSize(){
+  let size = 100;
+  try{ size = parseInt(localStorage.getItem('font-size-pref'),10) || 100; }catch(e){}
+  fontSizePref = size;
+  document.documentElement.style.fontSize = (size/100*16) + 'px';
+}
+function changeFontSize(delta){
+  fontSizePref = Math.max(80, Math.min(140, fontSizePref + delta));
+  document.documentElement.style.fontSize = (fontSizePref/100*16) + 'px';
+  try{ localStorage.setItem('font-size-pref', fontSizePref); }catch(e){}
+  render();
+}
+
+// ---------- Repli de la colonne ----------
+let railCollapsed = false;
+function initRailCollapse(){
+  try{ railCollapsed = localStorage.getItem('rail-collapsed')==='1'; }catch(e){}
+}
+function toggleRailCollapse(){
+  railCollapsed = !railCollapsed;
+  try{ localStorage.setItem('rail-collapsed', railCollapsed ? '1':'0'); }catch(e){}
+  render();
+}
+
+// ---------- Retour tactile (Android/Chrome uniquement — pas supporté sur iOS Safari) ----------
+function vibrate(pattern){
+  if(navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} }
+}
+
+async function togglePin(id){
+  const f = getFiche(id);
+  if(!f) return;
+  f.pinned = !f.pinned;
+  vibrate(15);
+  await saveData();
+  render();
+}
+
+function openAllToReview(){ state = { view:'allToReview' }; render(); }
+function openPriorityView(){ state = { view:'priority' }; render(); }
+
+// ---------- Mode lecture minimal ----------
+let readingMode = false;
+function toggleReadingMode(){ readingMode = !readingMode; render(); }
+
+// ---------- Lecture à voix haute ----------
+function stripMarkdownForSpeech(text){
+  return String(text)
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/^\s*[-*]\s+/gm, '')
+    .replace(/\$\$?(.+?)\$\$?/g, '$1')
+    .replace(/\|/g, ', ');
+}
+function isSpeaking(){
+  try{ return !!(window.speechSynthesis && window.speechSynthesis.speaking); }catch(e){ return false; }
+}
+function toggleSpeech(ficheId){
+  if(!window.speechSynthesis){ alert("La lecture à voix haute n'est pas disponible sur ce navigateur."); return; }
+  if(window.speechSynthesis.speaking){
+    window.speechSynthesis.cancel();
+    render();
+    return;
+  }
+  const f = getFiche(ficheId);
+  if(!f) return;
+  const text = f.title + '. ' + stripMarkdownForSpeech(f.content);
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'fr-FR';
+  utter.onend = () => { render(); };
+  utter.onerror = () => { render(); };
+  window.speechSynthesis.speak(utter);
+  render();
+}
+
+// ---------- Flashcards ----------
+let flashcardTimerEnabled = false;
+let flashcardTimerId = null;
+let flashcardSecondsLeft = 15;
+function initFlashcardTimerPref(){
+  try{ flashcardTimerEnabled = localStorage.getItem('flashcard-timer-pref') === '1'; }catch(e){}
+}
+function clearFlashcardCountdown(){
+  if(flashcardTimerId){ clearInterval(flashcardTimerId); flashcardTimerId = null; }
+}
+function startFlashcardCountdown(){
+  clearFlashcardCountdown();
+  if(!flashcardTimerEnabled) return;
+  flashcardSecondsLeft = 15;
+  flashcardTimerId = setInterval(()=>{
+    if(!state.view || state.view.type!=='flashcards' || state.view.revealed){ clearFlashcardCountdown(); return; }
+    flashcardSecondsLeft--;
+    const el = document.getElementById('flashcard-countdown');
+    if(el) el.textContent = flashcardSecondsLeft + 's';
+    if(flashcardSecondsLeft<=0){ clearFlashcardCountdown(); flashcardReveal(); }
+  }, 1000);
+}
+function toggleFlashcardTimerPref(){
+  flashcardTimerEnabled = !flashcardTimerEnabled;
+  try{ localStorage.setItem('flashcard-timer-pref', flashcardTimerEnabled?'1':'0'); }catch(e){}
+  if(flashcardTimerEnabled && state.view && state.view.type==='flashcards' && !state.view.revealed) startFlashcardCountdown();
+  else clearFlashcardCountdown();
+  render();
+}
+
+function openFlashcards(subjectId){
+  const list = visibleFichesOf(subjectId);
+  if(!list.length){ alert("Aucune fiche à réviser dans cette matière (avec le filtre actuel)."); return; }
+  state = { view: {type:'flashcards', subjectId, index:0, revealed:false} };
+  render();
+  startFlashcardCountdown();
+}
+function flashcardReveal(){ clearFlashcardCountdown(); state.view.revealed = true; render(); }
+function flashcardNext(){
+  const list = visibleFichesOf(state.view.subjectId);
+  if(state.view.index < list.length-1){ state.view.index++; state.view.revealed=false; render(); startFlashcardCountdown(); }
+}
+function flashcardPrev(){
+  if(state.view.index > 0){ state.view.index--; state.view.revealed=false; render(); startFlashcardCountdown(); }
+}
+
+// ---------- Mode présentation à deux ----------
+function openPresentation(subjectId){
+  const list = visibleFichesOf(subjectId);
+  if(!list.length){ alert("Aucune fiche à présenter dans cette matière."); return; }
+  state = { view: {type:'presentation', subjectId, index:0} };
+  render();
+}
+function presentationNext(){
+  const list = visibleFichesOf(state.view.subjectId);
+  if(state.view.index < list.length-1){ state.view.index++; render(); }
+}
+function presentationPrev(){
+  if(state.view.index > 0){ state.view.index--; render(); }
+}
+
+// ---------- Quiz ----------
+function parseQuiz(raw){
+  if(!raw) return [];
+  return raw.split('\n').map(l=>l.trim()).filter(Boolean).map(line=>{
+    const idx = line.indexOf('|');
+    if(idx===-1) return null;
+    return { q: line.slice(0,idx).trim(), a: line.slice(idx+1).trim() };
+  }).filter(Boolean);
+}
+function openQuiz(ficheId){
+  const f = getFiche(ficheId);
+  const pairs = f ? parseQuiz(f.quiz) : [];
+  if(!pairs.length){ alert("Cette fiche n'a pas de questions de quiz. Demande-en à Claude, puis colle-les dans le champ « Questions de quiz » en modifiant la fiche."); return; }
+  state = { view: {type:'quiz', ficheId, index:0, revealed:false} };
+  render();
+}
+function quizReveal(){ state.view.revealed = true; render(); }
+function quizNext(){
+  const f = getFiche(state.view.ficheId);
+  const pairs = parseQuiz(f.quiz);
+  if(state.view.index < pairs.length-1){ state.view.index++; state.view.revealed=false; render(); }
+}
+function quizPrev(){
+  if(state.view.index > 0){ state.view.index--; state.view.revealed=false; render(); }
+}
+
+// ---------- Minuteur Pomodoro ----------
+let pomodoroState = { running:false, seconds:25*60, mode:'travail', intervalId:null };
+function formatPomodoroTime(total){
+  const m = Math.floor(total/60), s = total%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function tickPomodoro(){
+  pomodoroState.seconds--;
+  const el = document.getElementById('pomodoro-time');
+  if(el) el.textContent = formatPomodoroTime(pomodoroState.seconds);
+  if(pomodoroState.seconds<=0){
+    clearInterval(pomodoroState.intervalId);
+    pomodoroState.running = false;
+    const finishedMode = pomodoroState.mode;
+    const nextMode = finishedMode==='travail' ? 'pause' : 'travail';
+    pomodoroState.mode = nextMode;
+    pomodoroState.seconds = nextMode==='travail' ? 25*60 : 5*60;
+    vibrate([100,60,100,60,100]);
+    render();
+    alert(finishedMode==='travail' ? "Séance terminée — c'est l'heure de la pause !" : "Pause terminée, au travail !");
+  }
+}
+function pomodoroToggle(){
+  if(pomodoroState.running){
+    clearInterval(pomodoroState.intervalId);
+    pomodoroState.running = false;
+  }else{
+    pomodoroState.running = true;
+    pomodoroState.intervalId = setInterval(tickPomodoro, 1000);
+  }
+  render();
+}
+function pomodoroReset(){
+  clearInterval(pomodoroState.intervalId);
+  pomodoroState.running = false;
+  pomodoroState.seconds = pomodoroState.mode==='travail' ? 25*60 : 5*60;
+  render();
+}
+function pomodoroSetMode(mode){
+  clearInterval(pomodoroState.intervalId);
+  pomodoroState = { running:false, seconds: mode==='travail'?25*60:5*60, mode, intervalId:null };
+  render();
+}
+function openPomodoro(){ state = { view:'pomodoro' }; render(); }
+
+// ---------- Fiche du jour ----------
+function ficheOfTheDay(){
+  if(!data.fiches.length) return null;
+  const today = new Date().toISOString().slice(0,10);
+  let hash = 0;
+  for(let i=0;i<today.length;i++){ hash = (hash*31 + today.charCodeAt(i)) >>> 0; }
+  return data.fiches[hash % data.fiches.length];
+}
+
+function openPrintView(subjectId){ state = { view: {type:'print', subjectId} }; render(); }
+function openPrintFiche(ficheId){ state = { view: {type:'printFiche', ficheId} }; render(); }
+
+// ---------- Suivi & motivation ----------
+function openStats(){ state = { view:'stats' }; render(); }
+function openSettings(){ state = { view:'settings' }; render(); }
+
+function weeklyAddCounts(weeks){
+  weeks = weeks || 8;
+  const now = new Date();
+  const buckets = [];
+  for(let i=weeks-1; i>=0; i--){
+    const end = new Date(now); end.setDate(end.getDate() - i*7);
+    const start = new Date(end); start.setDate(start.getDate()-6); start.setHours(0,0,0,0);
+    end.setHours(23,59,59,999);
+    const count = data.fiches.filter(f=>{
+      const d = new Date(f.dateAdded);
+      return d>=start && d<=end;
+    }).length;
+    buckets.push({ end, count });
+  }
+  return buckets;
+}
+
+function getActivityDays(){
+  const days = new Set();
+  data.fiches.forEach(f=>{
+    [f.dateAdded, f.dateEdited, f.lastViewed].forEach(iso=>{ if(iso) days.add(iso.slice(0,10)); });
+  });
+  return days;
+}
+function currentStreak(){
+  const days = getActivityDays();
+  const oneDay = 86400000;
+  let cursor = new Date();
+  let key = cursor.toISOString().slice(0,10);
+  if(!days.has(key)){
+    cursor = new Date(Date.now()-oneDay);
+    key = cursor.toISOString().slice(0,10);
+    if(!days.has(key)) return 0;
+  }
+  let streak = 0;
+  while(days.has(cursor.toISOString().slice(0,10))){
+    streak++;
+    cursor = new Date(cursor.getTime()-oneDay);
+  }
+  return streak;
+}
+
+let weeklyGoal = 5;
+function initWeeklyGoal(){
+  try{ weeklyGoal = parseInt(localStorage.getItem('weekly-goal-pref'),10) || 5; }catch(e){}
+}
+function setWeeklyGoal(n){
+  weeklyGoal = Math.max(1, Math.min(50, n || 5));
+  try{ localStorage.setItem('weekly-goal-pref', weeklyGoal); }catch(e){}
+  render();
+}
+
+// ---------- Emploi du temps simplifié ----------
+let schedulePref = {0:[],1:[],2:[],3:[],4:[],5:[],6:[]};
+function initSchedule(){
+  try{
+    const raw = localStorage.getItem('schedule-pref');
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(parsed && typeof parsed==='object') schedulePref = Object.assign({0:[],1:[],2:[],3:[],4:[],5:[],6:[]}, parsed);
+    }
+  }catch(e){}
+}
+function setScheduleDay(dayIdx, subjectIds){
+  schedulePref[dayIdx] = subjectIds;
+  try{ localStorage.setItem('schedule-pref', JSON.stringify(schedulePref)); }catch(e){}
+  render();
+}
+function currentWeekCount(){
+  const now = new Date();
+  const day = now.getDay();
+  const diffToMonday = (day===0?6:day-1);
+  const monday = new Date(now); monday.setDate(now.getDate()-diffToMonday); monday.setHours(0,0,0,0);
+  return data.fiches.filter(f=> new Date(f.dateAdded) >= monday).length;
+}
+
+function staleSubjects(thresholdDays){
+  thresholdDays = thresholdDays || 10;
+  const now = Date.now();
+  return activeSubjects().filter(s=>{
+    if(!fichesOf(s.id).length) return false;
+    if(!s.lastVisited) return true;
+    return (now - new Date(s.lastVisited).getTime())/86400000 >= thresholdDays;
+  }).sort((a,b)=>{
+    const da = a.lastVisited ? new Date(a.lastVisited).getTime() : 0;
+    const db = b.lastVisited ? new Date(b.lastVisited).getTime() : 0;
+    return da-db;
+  });
+}
+function goToSubject(id){
+  lastSubjectId = id;
+  const s = getSubject(id);
+  if(s){ s.lastVisited = new Date().toISOString(); saveData(); }
+  state = { view: {type:'subject', id} }; render();
+}
+function openFiche(id){
+  const f = getFiche(id);
+  if(f){ f.lastViewed = new Date().toISOString(); saveData(); }
+  mergePanelOpen = false;
+  state = { view: {type:'fiche', id} }; render();
+}
+function timeAgo(iso){
+  if(!iso) return null;
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if(days<=0) return "vu aujourd'hui";
+  if(days===1) return "vu hier";
+  return `vu il y a ${days} j`;
+}
+function openAddFiche(subjectId){
+  pendingAttachments = [];
+  const sid = subjectId || lastSubjectId || (data.subjects[0] && data.subjects[0].id);
+  state = { view: {type:'addFiche', subjectId: sid} }; render();
+}
+function openEditFiche(id){
+  const f = getFiche(id);
+  pendingAttachments = migrateAttachments(f).map(a=>({...a}));
+  state = { view: {type:'editFiche', id} }; render();
+}
+function openAddSubject(){ state = { view: {type:'addSubject'} }; render(); }
+function openManageSubjects(){ state = { view: {type:'manageSubjects'} }; render(); }
+function openEditSubject(id){
+  const s = getSubject(id);
+  if(s) pickedColor = s.color;
+  state = { view: {type:'editSubject', id} }; render();
+}
+function quickAdd(){ openAddFiche(activeSubjectId() || lastSubjectId); }
+function goToSearch(query){ state = { view: {type:'search', query} }; render(); }
+
+function activeSubjectId(){
+  const v = state.view;
+  if(v==='home') return null;
+  if(v.type==='subject') return v.id;
+  if(v.type==='addFiche') return v.subjectId;
+  if(v.type==='fiche'){ const f = getFiche(v.id); return f ? f.subjectId : null; }
+  if(v.type==='editFiche'){ const f = getFiche(v.id); return f ? f.subjectId : null; }
+  return null;
+}
+
+// ---------- Actions fiches ----------
+async function submitFiche(ev){
+  ev.preventDefault();
+  const form = ev.target;
+  const subjectId = form.subjectId.value;
+  const rawContent = form.content.value.trim();
+  const titleOverride = form.titleOverride.value.trim();
+  const chapter = form.chapter.value.trim();
+  const quiz = form.quiz.value.trim();
+  const sources = form.sources.value.trim();
+  const links = form.links ? Array.from(form.links.selectedOptions).map(o=>o.value) : [];
+  const tags = form.tags.value.trim() ? form.tags.value.split(',').map(t=>t.trim()).filter(Boolean) : [];
+  if(!rawContent && !titleOverride){ alert("Ajoute au moins un titre ou du contenu."); return; }
+  let title, content;
+  if(titleOverride){
+    title = titleOverride.slice(0,120);
+    content = rawContent;
+  }else{
+    ({ title, content } = splitTitleContent(rawContent));
+  }
+  const editId = form.dataset.editId;
+  const attachments = pendingAttachments.length ? pendingAttachments.map(a=>({...a})) : undefined;
+  if(editId){
+    const f = getFiche(editId);
+    if(f){
+      if(f.title !== title || f.content !== content){
+        if(!Array.isArray(f.history)) f.history = [];
+        f.history.push({ title: f.title, content: f.content, date: f.dateEdited || f.dateAdded });
+        if(f.history.length > 10) f.history = f.history.slice(-10);
+      }
+      f.subjectId = subjectId; f.title = title; f.content = content; f.chapter = chapter || undefined;
+      f.quiz = quiz || undefined; f.links = links.length ? links : undefined; f.tags = tags.length ? tags : undefined;
+      f.sources = sources || undefined;
+      f.dateEdited = new Date().toISOString(); f.attachments = attachments; delete f.attachment;
+    }
+  }else{
+    data.fiches.push({ id: uid(), subjectId, title, content, chapter: chapter || undefined, quiz: quiz || undefined, links: links.length ? links : undefined, tags: tags.length ? tags : undefined, sources: sources || undefined, dateAdded: new Date().toISOString(), attachments });
+    addXP(10);
+  }
+  lastSubjectId = subjectId;
+  pendingAttachments = [];
+  vibrate(15);
+  await saveData();
+  goToSubject(subjectId);
+}
+
+function scheduleUndoExpiry(){
+  clearTimeout(window.__undoTimer);
+  window.__undoTimer = setTimeout(()=>{ lastDeleted = null; render(); }, 8000);
+}
+
+async function undoDelete(){
+  if(!lastDeleted) return;
+  if(lastDeleted.type==='fiche'){
+    data.fiches.push(lastDeleted.fiche);
+    const subjectId = lastDeleted.fiche.subjectId;
+    lastDeleted = null;
+    clearTimeout(window.__undoTimer);
+    await saveData();
+    goToSubject(subjectId);
+  }else if(lastDeleted.type==='subject'){
+    const idx = Math.min(lastDeleted.index, data.subjects.length);
+    data.subjects.splice(idx, 0, lastDeleted.subject);
+    data.fiches.push(...lastDeleted.fiches);
+    lastDeleted = null;
+    clearTimeout(window.__undoTimer);
+    await saveData();
+    state = { view: 'manageSubjects' };
+    render();
+  }
+}
+
+async function deleteFiche(id){
+  const f = getFiche(id);
+  if(!f) return;
+  if(!confirm('Supprimer cette fiche ? (tu pourras annuler juste après)')) return;
+  vibrate(30);
+  data.fiches = data.fiches.filter(x=>x.id!==id);
+  lastDeleted = { type:'fiche', fiche: f };
+  await saveData();
+  goToSubject(f.subjectId);
+  scheduleUndoExpiry();
+}
+
+async function restoreVersion(ficheId, idx){
+  const f = getFiche(ficheId);
+  if(!f || !Array.isArray(f.history) || !f.history[idx]) return;
+  if(!confirm("Restaurer cette version ? La version actuelle sera gardée dans l'historique.")) return;
+  const target = f.history[idx];
+  f.history.push({ title: f.title, content: f.content, date: f.dateEdited || f.dateAdded });
+  if(f.history.length > 10) f.history = f.history.slice(-10);
+  f.title = target.title;
+  f.content = target.content;
+  f.dateEdited = new Date().toISOString();
+  await saveData();
+  render();
+}
+
+async function pasteFromClipboard(){
+  try{
+    const text = await navigator.clipboard.readText();
+    const ta = document.getElementById('f-raw');
+    if(ta && text){ ta.value = text; }
+  }catch(e){
+    alert("Impossible de coller automatiquement ici (autorisation refusée). Fais un appui long dans la zone de texte, puis choisis Coller.");
+  }
+}
+
+// ---------- Collage intelligent (fiche + quiz + liens en un coup) ----------
+function parseFicheBlock(raw){
+  const buffers = { titre:[], chapitre:[], contenu:[], quiz:[], sources:[], liens:[] };
+  let current = null;
+  raw.split('\n').forEach(line=>{
+    const m = /^###\s*(TITRE|CHAPITRE|CONTENU|QUIZ|SOURCES|LIENS)\s*$/i.exec(line.trim());
+    if(m){ current = m[1].toLowerCase(); return; }
+    if(current) buffers[current].push(line);
+  });
+  const sections = {};
+  Object.keys(buffers).forEach(k=> sections[k] = buffers[k].join('\n').trim());
+  return sections;
+}
+
+async function applyFullPaste(){
+  let raw;
+  try{
+    raw = await navigator.clipboard.readText();
+  }catch(e){
+    alert("Impossible de lire le presse-papiers automatiquement (autorisation refusée). Colle le texte manuellement (appui long → Coller) dans le champ Contenu, ou réessaie.");
+    return;
+  }
+  if(!raw || !/###\s*(TITRE|CONTENU)/i.test(raw)){
+    alert("Ce texte ne semble pas être une fiche au format attendu (### TITRE / ### CHAPITRE / ### CONTENU / ### QUIZ / ### SOURCES / ### LIENS). Si tu as copié le texte depuis la conversation, utilise le bouton de copie du bloc de code fourni par Claude plutôt qu'un simple copier-coller du texte, sinon demande à Claude de te la redonner dans ce format.");
+    return;
+  }
+  const sections = parseFicheBlock(raw);
+  const titleInput = document.getElementById('f-title');
+  const chapterInput = document.getElementById('f-chapter');
+  const contentArea = document.getElementById('f-raw');
+  const quizArea = document.getElementById('f-quiz');
+  const sourcesInput = document.getElementById('f-sources');
+  const linksSelect = document.getElementById('f-links');
+  if(titleInput) titleInput.value = sections.titre;
+  if(chapterInput && sections.chapitre) chapterInput.value = sections.chapitre;
+  if(contentArea) contentArea.value = sections.contenu;
+  if(quizArea) quizArea.value = sections.quiz;
+  if(sourcesInput && sections.sources) sourcesInput.value = sections.sources;
+  let matched = 0, total = 0;
+  if(linksSelect && sections.liens){
+    const wanted = sections.liens.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    total = wanted.length;
+    Array.from(linksSelect.options).forEach(opt=>{
+      if(wanted.includes(opt.textContent.trim().toLowerCase())){ opt.selected = true; matched++; }
+    });
+  }
+  const note = total ? ` (${matched}/${total} fiche(s) liée(s) reconnue(s))` : '';
+  alert('Fiche remplie automatiquement !' + note);
+}
+
+function readAndCompressImage(file, maxWidth, quality){
+  maxWidth = maxWidth || 1400; quality = quality || 0.72;
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width, height = img.height;
+        if(width > maxWidth){ height = Math.round(height * (maxWidth/width)); width = maxWidth; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+function readFileAsDataUrl(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handlePhotoInput(ev){
+  const file = ev.target.files[0];
+  if(!file) return;
+  try{
+    const dataUrl = await readAndCompressImage(file);
+    pendingAttachments.push({ type:'image', name:file.name, mime:'image/jpeg', dataUrl });
+    patchAttachmentPreview();
+  }catch(e){ alert("Impossible de lire cette photo."); }
+  ev.target.value = '';
+}
+
+async function handleFileInput(ev){
+  const file = ev.target.files[0];
+  if(!file) return;
+  if(file.size > 3*1024*1024){
+    alert("Ce fichier dépasse 3 Mo : il risque de ne pas se sauvegarder correctement sur cet appareil. Essaie un fichier plus léger.");
+    return;
+  }
+  try{
+    if(file.type.startsWith('image/')){
+      const dataUrl = await readAndCompressImage(file);
+      pendingAttachments.push({ type:'image', name:file.name, mime:'image/jpeg', dataUrl });
+    }else{
+      const dataUrl = await readFileAsDataUrl(file);
+      pendingAttachments.push({ type:'file', name:file.name, mime:file.type||'application/octet-stream', dataUrl });
+    }
+    patchAttachmentPreview();
+  }catch(e){ alert("Impossible de lire ce fichier."); }
+  ev.target.value = '';
+}
+
+function removeAttachmentAt(idx){ pendingAttachments.splice(idx,1); patchAttachmentPreview(); }
+
+function attachmentPreviewHtml(){
+  if(!pendingAttachments.length) return '';
+  return pendingAttachments.map((a,i)=>{
+    if(a.type==='image') return `<div class="attach-chip"><img src="${a.dataUrl}" alt=""><button type="button" class="btn ghost small" onclick="removeAttachmentAt(${i})">✕ Retirer</button></div>`;
+    if(a.type==='audio') return `<div class="attach-chip"><audio controls src="${a.dataUrl}" style="max-width:200px;"></audio><button type="button" class="btn ghost small" onclick="removeAttachmentAt(${i})">✕ Retirer</button></div>`;
+    return `<div class="attach-chip"><span>📎 ${esc(a.name)}</span><button type="button" class="btn ghost small" onclick="removeAttachmentAt(${i})">✕ Retirer</button></div>`;
+  }).join('');
+}
+function patchAttachmentPreview(){
+  const el = document.getElementById('attachment-preview');
+  if(el) el.innerHTML = attachmentPreviewHtml();
+}
+
+// ---------- Enregistrement vocal ----------
+let mediaRecorder = null;
+let recordedChunks = [];
+async function toggleRecording(){
+  if(mediaRecorder && mediaRecorder.state==='recording'){
+    mediaRecorder.stop();
+    return;
+  }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    alert("L'enregistrement audio n'est pas disponible sur ce navigateur.");
+    return;
+  }
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = e => { if(e.data.size>0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, { type:'audio/webm' });
+      stream.getTracks().forEach(t=>t.stop());
+      const reader = new FileReader();
+      reader.onload = () => {
+        pendingAttachments.push({ type:'audio', name:'Enregistrement vocal.webm', mime:'audio/webm', dataUrl: reader.result });
+        patchAttachmentPreview();
+        updateRecordButton();
+      };
+      reader.readAsDataURL(blob);
+    };
+    mediaRecorder.start();
+    updateRecordButton();
+  }catch(e){
+    alert("Impossible d'accéder au micro. Vérifie que l'accès au microphone est autorisé.");
+  }
+}
+function updateRecordButton(){
+  const btn = document.getElementById('record-btn');
+  if(btn) btn.textContent = (mediaRecorder && mediaRecorder.state==='recording') ? '⏹️ Arrêter l\'enregistrement' : '🎤 Enregistrer un audio';
+}
+
+let pickedColorForSubject = SWATCHES[0];
+function pickColor(hex){ pickedColor = hex; render(); }
+
+async function submitSubject(ev){
+  ev.preventDefault();
+  const form = ev.target;
+  const name = form.subjectName.value.trim();
+  const code = form.code.value.trim().toUpperCase().slice(0,5) || name.slice(0,3).toUpperCase();
+  const emoji = form.emoji ? form.emoji.value.trim().slice(0,8) : '';
+  const examDate = form.examDate ? (form.examDate.value || undefined) : undefined;
+  if(!name) return;
+  const id = 'm-' + uid();
+  data.subjects.push({ id, name, code, color: pickedColor, textColor: '#FDF9F1', emoji: emoji || undefined, examDate });
+  await saveData();
+  pickedColor = SWATCHES[0];
+  goToSubject(id);
+}
+
+let resetConfirmStep = false;
+let resetCheckboxChecked = false;
+function openResetConfirm(){ resetConfirmStep = true; resetCheckboxChecked = false; render(); }
+function cancelResetConfirm(){ resetConfirmStep = false; render(); }
+function toggleResetCheckbox(checked){
+  resetCheckboxChecked = checked;
+  const btn = document.getElementById('confirm-reset-btn');
+  if(btn) btn.disabled = !checked;
+}
+async function confirmResetFiches(){
+  if(!resetCheckboxChecked) return;
+  data = { subjects: DEFAULT_SUBJECTS.map(s=>({...s})), fiches: [] };
+  resetConfirmStep = false;
+  await saveData();
+  goHome();
+}
+
+async function moveSubject(id, dir){
+  const list = activeSubjects();
+  const i = list.findIndex(s=>s.id===id);
+  const j = i + dir;
+  if(i<0 || j<0 || j>=list.length) return;
+  const realA = subjectIndex(list[i].id), realB = subjectIndex(list[j].id);
+  const tmp = data.subjects[realA]; data.subjects[realA] = data.subjects[realB]; data.subjects[realB] = tmp;
+  await saveData();
+  render();
+}
+
+let dragSubjectId = null;
+function handleDragStart(id){ dragSubjectId = id; }
+function handleDragOver(ev){ ev.preventDefault(); }
+async function handleDrop(ev, targetId){
+  ev.preventDefault();
+  if(!dragSubjectId || dragSubjectId===targetId) return;
+  const fromIdx = subjectIndex(dragSubjectId);
+  const toIdx = subjectIndex(targetId);
+  dragSubjectId = null;
+  if(fromIdx<0 || toIdx<0) return;
+  const [moved] = data.subjects.splice(fromIdx,1);
+  data.subjects.splice(toIdx,0,moved);
+  await saveData();
+  render();
+}
+
+async function deleteSubject(id){
+  const s = getSubject(id);
+  if(!s) return;
+  const relatedFiches = fichesOf(id);
+  const count = relatedFiches.length;
+  const msg = count
+    ? `Supprimer « ${s.name} » et ses ${count} fiche(s) ? (Tu pourras annuler juste après)`
+    : `Supprimer « ${s.name} » ?`;
+  if(!confirm(msg)) return;
+  const indexBackup = subjectIndex(id);
+  data.subjects = data.subjects.filter(x=>x.id!==id);
+  data.fiches = data.fiches.filter(f=>f.subjectId!==id);
+  lastDeleted = { type:'subject', subject: s, fiches: relatedFiches, index: indexBackup };
+  await saveData();
+  state = { view: {type:'manageSubjects'} };
+  render();
+  scheduleUndoExpiry();
+}
+
+async function submitEditSubject(ev){
+  ev.preventDefault();
+  const form = ev.target;
+  const s = getSubject(form.dataset.editId);
+  if(!s) return;
+  s.name = form.subjectName.value.trim() || s.name;
+  s.code = form.code.value.trim().toUpperCase().slice(0,5) || s.code;
+  s.emoji = form.emoji ? (form.emoji.value.trim().slice(0,8) || undefined) : s.emoji;
+  s.examDate = form.examDate ? (form.examDate.value || undefined) : s.examDate;
+  s.color = pickedColor;
+  await saveData();
+  pickedColor = SWATCHES[0];
+  state = { view: {type:'manageSubjects'} };
+  render();
+}
+
+function slugify(str){
+  return String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,50) || 'fiche';
+}
+
+// ---------- Partager une seule fiche ----------
+function shareFiche(id){
+  const f = getFiche(id);
+  if(!f) return;
+  const s = getSubject(f.subjectId);
+  const payload = {
+    type: 'fiche-partagee',
+    version: 1,
+    subjectName: s ? s.name : null,
+    fiche: {
+      title: f.title, content: f.content, chapter: f.chapter, quiz: f.quiz,
+      sources: f.sources, tags: f.tags, attachments: migrateAttachments(f)
+    }
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'fiche-' + slugify(f.title) + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'fiches-de-raphael-export.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  try{ localStorage.setItem('last-export-date', new Date().toISOString()); }catch(e){}
+  if(state.view==='home') render();
+}
+function daysSinceLastExport(){
+  let last = null;
+  try{ last = localStorage.getItem('last-export-date'); }catch(e){}
+  if(!last) return Infinity;
+  return Math.floor((Date.now() - new Date(last).getTime())/86400000);
+}
+function triggerImport(){ document.getElementById('import-input').click(); }
+async function importData(ev){
+  const file = ev.target.files[0];
+  if(!file) return;
+  try{
+    const text = await file.text();
+    const incoming = JSON.parse(text);
+
+    // Cas d'un fichier « fiche partagée » (une seule fiche, via le bouton Partager)
+    if(incoming && incoming.type==='fiche-partagee' && incoming.fiche){
+      let subjectId = lastSubjectId || (data.subjects[0] && data.subjects[0].id);
+      if(incoming.subjectName){
+        const match = data.subjects.find(s=>s.name.toLowerCase()===String(incoming.subjectName).toLowerCase());
+        if(match) subjectId = match.id;
+      }
+      if(!subjectId){ alert("Crée d'abord une matière avant d'importer une fiche."); ev.target.value=''; return; }
+      const f = { ...incoming.fiche, id: uid(), subjectId, dateAdded: new Date().toISOString() };
+      migrateFicheStatus(f);
+      data.fiches.push(f);
+      addXP(10);
+      await saveData();
+      render();
+      const subjectName = getSubject(subjectId) ? getSubject(subjectId).name : incoming.subjectName;
+      alert('Fiche importée avec succès' + (subjectName ? ' dans « '+subjectName+' ».' : '.'));
+      ev.target.value = '';
+      return;
+    }
+
+    if(!incoming || !Array.isArray(incoming.subjects) || !Array.isArray(incoming.fiches)){
+      alert("Ce fichier ne ressemble pas à un export valide.");
+      return;
+    }
+    const existingSubjectIds = new Set(data.subjects.map(s=>s.id));
+    incoming.subjects.forEach(s=>{ if(!existingSubjectIds.has(s.id)){ data.subjects.push(s); existingSubjectIds.add(s.id); } });
+    const existingFicheIds = new Set(data.fiches.map(f=>f.id));
+    let added = 0;
+    incoming.fiches.forEach(f=>{ if(!existingFicheIds.has(f.id)){ migrateFicheStatus(f); data.fiches.push(f); existingFicheIds.add(f.id); added++; } });
+    await saveData();
+    render();
+    alert(added + " fiche(s) importée(s) avec succès.");
+  }catch(e){
+    alert("Impossible de lire ce fichier. Vérifie que c'est bien un export généré par ce site.");
+  }
+  ev.target.value = '';
+}
+
+// ---------- Recherche ----------
+let searchDebounceTimer;
+function searchInputValue(){
+  return (state.view!=='home' && state.view.type==='search') ? esc(state.view.query) : '';
+}
+function handleSearchInput(value){
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(()=>{
+    if(value.trim()) goToSearch(value.trim());
+    else if(state.view!=='home' && state.view.type==='search') goHome();
+  }, 180);
+}
+document.addEventListener('keydown', (e)=>{
+  if(e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA'){
+    e.preventDefault();
+    const el = document.getElementById('rail-search-input');
+    if(el) el.focus();
+  }
+});
+
+// ---------- Décoration ----------
+const DOODLE = `<svg width="130" height="80" viewBox="0 0 130 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M5 55 C 18 10, 42 8, 50 38 C 58 68, 82 66, 88 32 C 94 2, 116 12, 125 42" stroke="#2B2019" stroke-width="6.5" stroke-linecap="round"/>
+</svg>`;
+const UNDERLINE = `<svg viewBox="0 0 120 10" xmlns="http://www.w3.org/2000/svg"><path d="M2 6 C 20 1, 40 9, 60 5 C 80 1, 100 9, 118 4" stroke="#C1452A" stroke-width="3.2" stroke-linecap="round" fill="none"/></svg>`;
+
+// ---------- Rendu ----------
+function render(){
+  const active = document.activeElement;
+  const activeId = active && active.id;
+  let selStart, selEnd;
+  if(activeId && typeof active.selectionStart === 'number'){
+    selStart = active.selectionStart; selEnd = active.selectionEnd;
+  }
+  const app = document.getElementById('app');
+  if(!dataLoaded){
+    app.innerHTML = `<div style="padding:60px;color:#7A6A58;font-family:Poppins,sans-serif;">Chargement…</div>`;
+    return;
+  }
+  const isPresentation = !!(state.view && typeof state.view==='object' && state.view.type==='presentation');
+  const hideChrome = railCollapsed || readingMode || isPresentation;
+  app.innerHTML = `${renderOfflineBanner()}<div class="layout ${hideChrome?'rail-collapsed':''}">${hideChrome ? '' : renderRail()}<main class="main">${renderMain()}</main></div>${renderFab()}${renderUndoBanner()}${railCollapsed ? `<button class="rail-reopen no-print" onclick="toggleRailCollapse()" aria-label="Afficher le menu" title="Afficher le menu">☰</button>` : ''}`;
+  renderMathIn('.md-content');
+  if(activeId){
+    const el = document.getElementById(activeId);
+    if(el){
+      el.focus();
+      if(selStart !== undefined && typeof el.setSelectionRange === 'function'){
+        try{ el.setSelectionRange(selStart, selEnd); }catch(e){}
+      }
+    }
+  }
+}
+
+function renderUndoBanner(){
+  if(!lastDeleted) return '';
+  const label = lastDeleted.type==='subject' ? 'Matière supprimée.' : 'Fiche supprimée.';
+  return `<div class="undo-banner no-print">${label} <button onclick="undoDelete()">Annuler</button></div>`;
+}
+
+function renderFab(){
+  const v = state.view;
+  const hideOn = ['addFiche','editFiche','addSubject','print','presentation'];
+  if(v !== 'home' && hideOn.includes(v.type)) return '';
+  return `<button class="fab no-print" onclick="quickAdd()" aria-label="Ajouter une fiche" title="Ajouter une fiche">+</button>`;
+}
+
+function renderRail(){
+  const activeId = activeSubjectId();
+  const subjectsHtml = activeSubjects().map((s,i)=>{
+    const count = fichesOf(s.id).length;
+    const active = activeId === s.id;
+    return `<button class="tab ${active?'active':''}" style="--tab-color:${s.color}; --tab-text:${s.textColor}" onclick="goToSubject('${s.id}')">
+      <span class="tab-badge">${pad2(i+1)}</span>
+      <span class="tab-dot" style="background:${s.color}"></span>
+      <span class="tab-name">${s.emoji ? esc(s.emoji)+' ' : ''}${esc(s.name)}</span>
+      <span class="tab-count">${count}</span>
+    </button>`;
+  }).join('');
+
+  return `
+  <nav class="rail">
+    <div class="rail-top">
+      <div class="rail-brand-row">
+        <div class="brand">LES FICHES<span class="script">de Raphaël</span></div>
+        <div class="rail-icon-buttons">
+          <button class="icon-btn" onclick="openSettings()" aria-label="Paramètres" title="Paramètres">⚙️</button>
+          <button class="icon-btn rail-collapse-btn" onclick="toggleRailCollapse()" aria-label="Réduire le menu" title="Réduire le menu">«</button>
+        </div>
+      </div>
+      <div class="rail-sub">Rangées par importance</div>
+      <div class="rail-search"><input type="search" id="rail-search-input" placeholder="Rechercher (appuie sur /)…" value="${searchInputValue()}" oninput="handleSearchInput(this.value)"></div>
+    </div>
+    <div class="rail-nav">
+      <button class="home-row ${state.view==='home' ? 'active':''}" onclick="goHome()">Accueil</button>
+      <button class="home-row ${state.view==='allToReview' ? 'active':''}" onclick="openAllToReview()">🔶 À revoir (${data.fiches.filter(f=>isDueForReview(f)).length})</button>
+      <button class="home-row ${state.view==='priority' ? 'active':''}" onclick="openPriorityView()">🎯 Priorité</button>
+      <button class="home-row ${state.view==='pomodoro' ? 'active':''}" onclick="openPomodoro()">⏱️ Minuteur</button>
+      <button class="home-row ${state.view==='stats' ? 'active':''}" onclick="openStats()">📊 Suivi</button>
+      <div class="rail-subjects">${subjectsHtml}</div>
+      <button class="add-subject-btn" onclick="openAddSubject()">+ Nouvelle matière</button>
+      <button class="add-subject-btn" onclick="openManageSubjects()">🗂️ Gérer les matières</button>
+    </div>
+  </nav>`;
+}
+
+function renderMain(){
+  const v = state.view;
+  if(!(v && typeof v==='object' && v.type==='fiche')){
+    readingMode = false;
+    try{ if(window.speechSynthesis && window.speechSynthesis.speaking) window.speechSynthesis.cancel(); }catch(e){}
+  }
+  if(v==='home') return renderHome();
+  if(v==='allToReview') return renderAllToReview();
+  if(v==='priority') return renderPriorityView();
+  if(v==='pomodoro') return renderPomodoro();
+  if(v==='stats') return renderStats();
+  if(v==='settings') return renderSettings();
+  if(v.type==='subject') return renderSubjectView(v.id);
+  if(v.type==='tag') return renderTagView(v.tag);
+  if(v.type==='fiche') return renderFicheDetail(v.id);
+  if(v.type==='addFiche') return renderFicheForm({subjectId: v.subjectId});
+  if(v.type==='editFiche') return renderFicheForm({ficheId: v.id});
+  if(v.type==='addSubject') return renderAddSubjectForm();
+  if(v.type==='manageSubjects') return renderManageSubjects();
+  if(v.type==='editSubject') return renderEditSubjectForm(v.id);
+  if(v.type==='search') return renderSearchResults(v.query);
+  if(v.type==='print') return renderPrintView(v.subjectId);
+  if(v.type==='printFiche') return renderPrintFiche(v.ficheId);
+  if(v.type==='flashcards') return renderFlashcards(v);
+  if(v.type==='presentation') return renderPresentation(v);
+  if(v.type==='quiz') return renderQuiz(v);
+  return renderHome();
+}
+
+// ---------- Blocs d'accueil réorganisables ----------
+function renderHomeBlockResume(){
+  const recent = mostRecentFiche();
+  const resumeHtml = recent ? `<div class="resume-card" tabindex="0" onclick="openFiche('${recent.id}')" onkeypress="if(event.key==='Enter') openFiche('${recent.id}')"><span class="resume-label">Reprendre</span> ${esc(recent.title)}</div>` : '';
+  const dayFiche = ficheOfTheDay();
+  const dayFicheHtml = dayFiche ? `<div class="day-fiche-card" tabindex="0" onclick="openFiche('${dayFiche.id}')" onkeypress="if(event.key==='Enter') openFiche('${dayFiche.id}')">
+    <div class="day-fiche-label">🎲 Fiche du jour</div>
+    <div class="day-fiche-title">${esc(dayFiche.title)}</div>
+  </div>` : '';
+  if(!resumeHtml && !dayFicheHtml) return '';
+  return `<div style="display:flex; gap:14px; flex-wrap:wrap;">${resumeHtml}${dayFicheHtml}</div>`;
+}
+function renderHomeBlockStats(){
+  const totalFiches = data.fiches.length;
+  const totalSubjects = activeSubjects().length;
+  const toReviewCount = data.fiches.filter(f=>isDueForReview(f)).length;
+  const masteredCount = data.fiches.filter(f=>f.confidence!==undefined && f.confidence>=4).length;
+  return `<div class="stats-row">
+      <div class="stat"><div class="num">${totalFiches}</div><div class="label">Fiche${totalFiches===1?'':'s'}</div></div>
+      <div class="stat"><div class="num">${totalSubjects}</div><div class="label">Matière${totalSubjects===1?'':'s'}</div></div>
+      <div class="stat"><div class="num" style="color:#F0B429;">${toReviewCount}</div><div class="label">À revoir</div></div>
+      <div class="stat"><div class="num" style="color:#3F8F5C;">${masteredCount}</div><div class="label">Maîtrisées</div></div>
+    </div>`;
+}
+function renderHomeBlockSubjects(){
+  const cards = activeSubjects().map((s,i)=>{
+    const count = fichesOf(s.id).length;
+    const emoji = s.emoji ? esc(s.emoji)+' ' : '';
+    const examDays = daysUntil(s.examDate);
+    const examBadgeHtml = examDays !== null && examDays <= 30 ? `<span class="exam-badge">⏳ ${examBadgeLabel(examDays)}</span>` : '';
+    return `<div class="subject-card" tabindex="0" onclick="goToSubject('${s.id}')" onkeypress="if(event.key==='Enter') goToSubject('${s.id}')">
+      <div class="card-top"><span class="swatch" style="background:${s.color}"></span><span class="name">${pad2(i+1)} · ${emoji}${esc(s.name)}</span></div>
+      <div class="count">${count} fiche${count===1?'':'s'}${examBadgeHtml}</div>
+    </div>`;
+  }).join('');
+  return `<div class="grid">${cards}</div>`;
+}
+function renderHomeBlockHowItWorks(){
+  return `<div class="howitworks">
+      <h2>Comment une fiche arrive ici</h2>
+      <span class="underline">${UNDERLINE}</span>
+      <ol>
+        <li><b>Tape sur le bouton « + »</b> (en bas de l'écran, visible partout) : colle ta fiche en un seul champ, la première ligne devient le titre.</li>
+        <li><b>Demande le contenu à Claude</b>, copie-le, puis utilise « Coller depuis le presse-papiers » dans le formulaire.</li>
+        <li><b>Recherche une fiche</b> à tout moment avec la barre en haut de la colonne de gauche (ou la touche « / »).</li>
+      </ol>
+      <div class="note">Si tu actives la synchronisation cloud (voir les instructions fournies à part), tout se synchronise automatiquement entre tes appareils — le texte, les photos et les fichiers joints.</div>
+    </div>`;
+}
+function renderHomeBlockXP(){
+  const level = xpLevel();
+  const progress = xpProgressInLevel();
+  return `<div class="howitworks xp-block">
+      <h2>🏆 Niveau ${level}</h2>
+      <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${progress}%"></div></div>
+      <div class="goal-text">${xpTotal} XP au total · ${progress}/100 XP avant le niveau ${level+1}</div>
+    </div>`;
+}
+function renderHomeBlockTip(){
+  return `<div class="reminder-card" style="border-left-color: var(--brown-block);">
+      <div class="reminder-label">💡 Astuce du jour</div>
+      <div class="reminder-line">${esc(tipOfTheDay())}</div>
+    </div>`;
+}
+function renderHomeBlockToday(){
+  const dayIdx = new Date().getDay();
+  const ids = schedulePref[dayIdx] || [];
+  const subjects = ids.map(id=>getSubject(id)).filter(Boolean);
+  if(!subjects.length) return '';
+  const dayNames = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  return `<div class="howitworks">
+      <h2>📅 Aujourd'hui : ${dayNames[dayIdx]}</h2>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
+        ${subjects.map(s=>`<button type="button" class="link-chip" onclick="goToSubject('${s.id}')">${s.emoji?esc(s.emoji)+' ':''}${esc(s.name)}</button>`).join('')}
+      </div>
+    </div>`;
+}
+function renderHomeBlockEvening(){
+  const picks = eveningSelection();
+  if(!picks.length) return '';
+  return `<div class="howitworks">
+      <h2>🌙 Sélection du soir</h2>
+      <p style="font-size:0.85rem; color:var(--ink-soft); margin:0 0 12px;">3 fiches courtes pour une dernière révision rapide avant de dormir.</p>
+      <div class="grid" style="margin-bottom:0;">${picks.map(f=>renderFicheCard(f,{showSubject:true})).join('')}</div>
+    </div>`;
+}
+const HOME_BLOCKS = {
+  resume:     { label: 'Reprendre / Fiche du jour', render: renderHomeBlockResume },
+  tip:        { label: 'Astuce du jour',            render: renderHomeBlockTip },
+  today:      { label: "Emploi du temps du jour",   render: renderHomeBlockToday },
+  stats:      { label: 'Statistiques',              render: renderHomeBlockStats },
+  xp:         { label: 'Points & niveau',            render: renderHomeBlockXP },
+  subjects:   { label: 'Grille des matières',        render: renderHomeBlockSubjects },
+  evening:    { label: 'Sélection du soir',          render: renderHomeBlockEvening },
+  howitworks: { label: 'Comment ça marche',          render: renderHomeBlockHowItWorks }
+};
+let homeBlockOrder = ['resume','tip','today','stats','xp','subjects','evening','howitworks'];
+function initHomeBlockOrder(){
+  try{
+    const raw = localStorage.getItem('home-blocks-order');
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed) && parsed.length){
+        const valid = parsed.filter(id=>HOME_BLOCKS[id]);
+        Object.keys(HOME_BLOCKS).forEach(id=>{ if(!valid.includes(id)) valid.push(id); });
+        homeBlockOrder = valid;
+      }
+    }
+  }catch(e){}
+}
+let homeReorderMode = false;
+function toggleHomeReorderMode(){ homeReorderMode = !homeReorderMode; render(); }
+let dragHomeBlockId = null;
+function handleHomeBlockDragStart(id){ dragHomeBlockId = id; }
+function handleHomeBlockDragOver(ev){ ev.preventDefault(); }
+function handleHomeBlockDrop(ev, targetId){
+  ev.preventDefault();
+  if(!dragHomeBlockId || dragHomeBlockId===targetId){ dragHomeBlockId=null; return; }
+  const fromIdx = homeBlockOrder.indexOf(dragHomeBlockId);
+  const toIdx = homeBlockOrder.indexOf(targetId);
+  dragHomeBlockId = null;
+  if(fromIdx<0 || toIdx<0) return;
+  homeBlockOrder.splice(toIdx, 0, homeBlockOrder.splice(fromIdx,1)[0]);
+  try{ localStorage.setItem('home-blocks-order', JSON.stringify(homeBlockOrder)); }catch(e){}
+  render();
+}
+
+function renderHome(){
+  const upcomingExams = subjectsWithUpcomingExam(7);
+  const examReminderHtml = upcomingExams.length ? `
+    <div class="reminder-card" style="border-left-color:#A3342A;">
+      <div class="reminder-label" style="color:#A3342A;">⏳ Contrôle à venir</div>
+      ${upcomingExams.map(s=>`<div class="reminder-line">${esc(s.name)} : <b>${examBadgeLabel(daysUntil(s.examDate))}</b></div>`).join('')}
+    </div>` : '';
+
+  const stale = staleSubjects(10).slice(0,2);
+  const reminderHtml = stale.length ? `
+    <div class="reminder-card">
+      <div class="reminder-label">💡 Petit rappel</div>
+      ${stale.map(s=>{
+        const days = s.lastVisited ? Math.floor((Date.now()-new Date(s.lastVisited).getTime())/86400000) : null;
+        return `<div class="reminder-line">Ça fait un moment que tu n'as pas ouvert <b>${esc(s.name)}</b>${days!==null ? ' ('+days+' j)' : ''} — une petite révision ?</div>`;
+      }).join('')}
+    </div>` : '';
+
+  const blocksHtml = homeBlockOrder.map(id=>{
+    const block = HOME_BLOCKS[id];
+    if(!block) return '';
+    const inner = block.render();
+    if(!inner) return '';
+    if(!homeReorderMode) return inner;
+    return `<div class="home-block-wrap" draggable="true" ondragstart="handleHomeBlockDragStart('${id}')" ondragover="handleHomeBlockDragOver(event)" ondrop="handleHomeBlockDrop(event,'${id}')">
+      <div class="home-block-handle">⠿ ${esc(block.label)}</div>
+      ${inner}
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="doodle-corner">${DOODLE}</div>
+    <p class="eyebrow">Ton espace de révision</p>
+    <h1 class="hero">LES FICHES<span class="script">de Raphaël</span></h1>
+    <p class="lede">Cet espace range tes fiches, matière par matière, de la plus importante à la moins importante.</p>
+    <div class="home-reorder-row no-print">
+      <button type="button" class="footer-link" onclick="toggleHomeReorderMode()">${homeReorderMode ? '✅ Terminé — j\'ai fini de réorganiser' : '🔀 Réorganiser l\'ordre de cette page'}</button>
+    </div>
+    ${examReminderHtml}
+    ${reminderHtml}
+    ${homeReorderMode ? `<p class="lede" style="margin-top:-10px; font-size:0.85rem;">Glisse un bloc (⠿) pour changer l'ordre d'affichage de la page d'accueil.</p>` : ''}
+
+    ${blocksHtml}
+
+    ${(data.fiches.length>0 && daysSinceLastExport()>=7) ? `
+    <div class="reminder-card">
+      <div class="reminder-label">🗄️ Sauvegarde</div>
+      <div class="reminder-line">Ça fait plus d'une semaine que tu n'as pas exporté tes fiches en sauvegarde. <button type="button" class="link-chip" onclick="exportData()">Exporter maintenant</button></div>
+    </div>` : ''}
+
+    <input type="file" id="import-input" accept="application/json" style="display:none" onchange="importData(event)">
+  `;
+}
+
+function renderSettings(){
+  return `
+    <p class="eyebrow">Paramètres</p>
+    <h1 class="hero" style="font-size:2rem;">⚙️ Réglages</h1>
+
+    <div class="howitworks">
+      <h2>Apparence</h2>
+      <div class="settings-row">
+        <span>Thème</span>
+        <button class="btn ghost small" onclick="toggleTheme()">${document.documentElement.getAttribute('data-theme')==='dark' ? '☀️ Passer en clair' : '🌙 Passer en sombre'}</button>
+      </div>
+      <div class="settings-row">
+        <span>Taille du texte</span>
+        <div class="font-size-control">
+          <button class="font-btn" onclick="changeFontSize(-10)" aria-label="Réduire le texte">A-</button>
+          <span class="font-size-value">${fontSizePref}%</span>
+          <button class="font-btn" onclick="changeFontSize(10)" aria-label="Agrandir le texte">A+</button>
+        </div>
+      </div>
+      <div class="settings-row" style="align-items:flex-start; flex-direction:column;">
+        <span style="margin-bottom:10px;">Palette de couleurs</span>
+        <div class="palette-picker">
+          ${PALETTES.map(p=>`<div class="palette-option ${palettePref===p.id?'selected':''}" style="background:${p.swatch}" title="${esc(p.name)}" onclick="setPalette('${p.id}')"></div>`).join('')}
+        </div>
+      </div>
+      <div class="settings-row" style="align-items:flex-start; flex-direction:column;">
+        <span style="margin-bottom:10px;">Police du site</span>
+        <div class="font-picker">
+          ${FONT_PAIRINGS.map(p=>`<button type="button" class="font-option ${fontPref===p.id?'selected':''}" style="font-family:${p.body}" onclick="setFontPairing('${p.id}')"><span class="font-option-name">${esc(p.name)}</span>Aa — Les Fiches</button>`).join('')}
+        </div>
+      </div>
+      <div class="settings-row">
+        <span>Contraste élevé</span>
+        <button class="btn ghost small" onclick="toggleHighContrast()">${highContrast ? '✅ Activé' : 'Activer'}</button>
+      </div>
+      <div class="settings-row">
+        <span>Réduire toutes les animations</span>
+        <button class="btn ghost small" onclick="toggleReduceMotion()">${reduceMotionPref ? '✅ Activé' : 'Activer'}</button>
+      </div>
+    </div>
+
+    <div class="howitworks">
+      <h2>Sauvegarde & synchronisation</h2>
+      <div class="settings-row">
+        <span>${syncBadgeLabel()}</span>
+        <button class="btn ghost small" onclick="checkConnection()">Vérifier la connexion</button>
+      </div>
+      <div id="connection-check-result" class="connection-result"></div>
+      <div class="settings-row" style="margin-top:14px;">
+        <span>Espace de stockage cloud utilisé</span>
+        <button class="btn ghost small" onclick="checkStorageUsage()">Vérifier l'espace utilisé</button>
+      </div>
+      <div id="storage-usage-result" class="connection-result"></div>
+      <div class="backup-row" style="margin-top:14px;">
+        <button class="footer-link" onclick="exportData()">Exporter mes fiches</button>
+        <button class="footer-link" onclick="triggerImport()">Importer des fiches</button>
+      </div>
+    </div>
+
+    <div class="howitworks">
+      <h2>🔍 Vérification des données</h2>
+      <p style="font-size:0.85rem; color:var(--ink-soft); margin:0 0 12px;">Recherche des fiches en double, des données incomplètes ou des liens cassés.</p>
+      <button class="btn ghost small" onclick="runAnomalyCheck()">Vérifier maintenant</button>
+      ${anomalyCheckResults !== null ? (
+        anomalyCheckResults.length === 0
+          ? `<p style="font-size:0.85rem; color:#3F8F5C; margin-top:12px; font-weight:600;">✅ Aucun problème détecté.</p>`
+          : `<ul style="font-size:0.82rem; color:var(--ink-soft); margin:12px 0 0; padding-left:20px;">${anomalyCheckResults.map(msg=>`<li style="margin-bottom:6px;">${esc(msg)}</li>`).join('')}</ul>`
+      ) : ''}
+    </div>
+
+    <div class="howitworks">
+      <h2>📅 Emploi du temps</h2>
+      <p style="font-size:0.85rem; color:var(--ink-soft); margin:0 0 14px;">Choisis les matières de chaque jour pour voir « Aujourd'hui » sur l'accueil (Ctrl/Cmd + clic pour en choisir plusieurs).</p>
+      ${[1,2,3,4,5,6,0].map(dayIdx=>{
+        const dayNames = {0:'Dimanche',1:'Lundi',2:'Mardi',3:'Mercredi',4:'Jeudi',5:'Vendredi',6:'Samedi'};
+        return `<div class="field">
+          <label>${dayNames[dayIdx]}</label>
+          <select multiple size="3" onchange="setScheduleDay(${dayIdx}, Array.from(this.selectedOptions).map(o=>o.value))">
+            ${activeSubjects().map(s=>`<option value="${s.id}" ${(schedulePref[dayIdx]||[]).includes(s.id)?'selected':''}>${s.emoji?esc(s.emoji)+' ':''}${esc(s.name)}</option>`).join('')}
+          </select>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="howitworks" style="border-top-color:#A3342A;">
+      <h2 style="color:#A3342A;">Zone sensible</h2>
+      <p style="font-size:0.85rem; color:var(--ink-soft); margin:0 0 12px;">Supprime définitivement toutes tes fiches et remet les matières par défaut.</p>
+      ${resetConfirmStep ? `
+      <div class="reset-confirm-box">
+        <p style="font-size:0.85rem; color:#A3342A; font-weight:700; margin:0 0 12px;">⚠️ Cette action supprimera toutes tes fiches, sans retour possible.</p>
+        <label class="checkbox-row" style="margin-bottom:14px;">
+          <input type="checkbox" onchange="toggleResetCheckbox(this.checked)">
+          <span>Je comprends que cette action est irréversible</span>
+        </label>
+        <div class="form-actions" style="margin-top:0;">
+          <button id="confirm-reset-btn" class="btn" onclick="confirmResetFiches()" disabled style="background:#A3342A;">Confirmer la réinitialisation définitive</button>
+          <button class="btn ghost" onclick="cancelResetConfirm()">Annuler</button>
+        </div>
+      </div>` : `<button class="footer-link" onclick="openResetConfirm()">Réinitialiser mes fiches</button>`}
+    </div>
+  `;
+}
+
+function renderSearchResults(query){
+  const q = query.toLowerCase();
+  const matches = data.fiches.filter(f => f.title.toLowerCase().includes(q) || f.content.toLowerCase().includes(q) || (f.tags||[]).some(t=>t.toLowerCase().includes(q)));
+  const cardsHtml = matches.map(f=>renderFicheCard(f,{showSubject:true})).join('');
+  return `
+    <p class="eyebrow">Recherche</p>
+    <h1 class="hero" style="font-size:2rem;">${matches.length} résultat${matches.length===1?'':'s'} pour « ${esc(query)} »</h1>
+    ${matches.length ? `<div class="grid" style="margin-top:26px;">${cardsHtml}</div>` : `<div class="empty-state" style="margin-top:26px;"><p>Aucune fiche ne correspond à cette recherche.</p></div>`}
+  `;
+}
+
+function renderAllToReview(){
+  const list = data.fiches.filter(f=>isDueForReview(f))
+    .sort((a,b)=> (b.dateEdited||b.dateAdded).localeCompare(a.dateEdited||a.dateAdded));
+  const cardsHtml = list.map(f=>renderFicheCard(f,{showSubject:true})).join('');
+  return `
+    <p class="eyebrow">Toutes matières</p>
+    <h1 class="hero" style="font-size:2rem;">🔶 À revoir</h1>
+    <p class="lede">Fiches jamais évaluées, ou dont la date de révision suggérée est passée.</p>
+    ${list.length ? `<div class="grid" style="margin-top:6px;">${cardsHtml}</div>` : `<div class="empty-state" style="margin-top:26px;"><p>Rien à revoir pour l'instant, bien joué !</p></div>`}
+  `;
+}
+
+function renderPriorityView(){
+  const due = data.fiches.filter(f=>isDueForReview(f));
+  const ranked = due
+    .map(f=>({ f, rank: activeRank(f.subjectId) }))
+    .filter(x=>x.rank>=0)
+    .sort((a,b)=> a.rank - b.rank || (a.f.confidence===undefined?3:a.f.confidence) - (b.f.confidence===undefined?3:b.f.confidence));
+  const cardsHtml = ranked.map(x=>renderFicheCard(x.f,{showSubject:true})).join('');
+  return `
+    <p class="eyebrow">Toutes matières</p>
+    <h1 class="hero" style="font-size:2rem;">🎯 Vue priorité</h1>
+    <p class="lede">Les fiches à revoir, classées d'abord par importance de la matière, puis par confiance la plus faible.</p>
+    ${ranked.length ? `<div class="grid" style="margin-top:6px;">${cardsHtml}</div>` : `<div class="empty-state" style="margin-top:26px;"><p>Rien à prioriser pour l'instant.</p></div>`}
+  `;
+}
+
+function sortFilterBarHtml(){
+  return `
+    <div class="sort-filter-row no-print">
+      <select onchange="setSort(this.value)" aria-label="Trier">
+        <option value="date-desc" ${currentSort==='date-desc'?'selected':''}>Plus récent d'abord</option>
+        <option value="date-asc" ${currentSort==='date-asc'?'selected':''}>Plus ancien d'abord</option>
+        <option value="title-asc" ${currentSort==='title-asc'?'selected':''}>Titre A→Z</option>
+        <option value="title-desc" ${currentSort==='title-desc'?'selected':''}>Titre Z→A</option>
+        <option value="status" ${currentSort==='status'?'selected':''}>Confiance (moins sûr d'abord)</option>
+        <option value="manuel" ${currentSort==='manuel'?'selected':''}>Ordre manuel (glisser-déposer)</option>
+      </select>
+      <select onchange="setFilter(this.value)" aria-label="Filtrer">
+        <option value="all" ${currentFilter==='all'?'selected':''}>Toutes les fiches</option>
+        <option value="a-revoir" ${currentFilter==='a-revoir'?'selected':''}>À revoir maintenant</option>
+        <option value="maitrisee" ${currentFilter==='maitrisee'?'selected':''}>Bien maîtrisées (4-5)</option>
+        <option value="sans-statut" ${currentFilter==='sans-statut'?'selected':''}>Jamais évaluées</option>
+      </select>
+    </div>`;
+}
+
+function renderSubjectView(id){
+  const s = getSubject(id);
+  if(!s) return renderHome();
+  const totalCount = fichesOf(id).length;
+  const visible = visibleFichesOf(id);
+  let body;
+  if(!totalCount){
+    body = `<div class="empty-state">
+      <p>Aucune fiche ici pour l'instant. La prochaine sur « ${esc(s.name)} » atterrira dans cette page.</p>
+      <button class="btn" onclick="openAddFiche('${s.id}')">+ Ajouter une fiche</button>
+    </div>`;
+  }else if(!visible.length){
+    body = `<div class="empty-state"><p>Aucune fiche ne correspond à ce filtre.</p></div>`;
+  }else{
+    const hasChapters = visible.some(f=>f.chapter && f.chapter.trim());
+    if(hasChapters && currentSort!=='manuel'){
+      body = groupByChapter(visible).map(g=>`
+        <h3 class="chapter-heading">${esc(g.label)}</h3>
+        <div class="grid">${g.fiches.map(f=>renderFicheCard(f)).join('')}</div>
+      `).join('');
+    }else{
+      body = `<div class="grid">${visible.map(f=>renderFicheCard(f)).join('')}</div>`;
+    }
+  }
+  const archivedNote = s.archived ? `<div class="reminder-card" style="margin-bottom:20px;"><div class="reminder-label">📦 Matière archivée</div><div class="reminder-line">Elle n'apparaît plus dans le menu ni sur l'accueil. <button type="button" class="link-chip" onclick="toggleArchiveSubject('${s.id}')">Désarchiver</button></div></div>` : '';
+  const examDays = daysUntil(s.examDate);
+  const examBadgeHtml = examDays !== null ? `<span class="exam-badge">⏳ ${examBadgeLabel(examDays)}</span>` : '';
+
+  return `
+    ${archivedNote}
+    <div class="subject-header">
+      <div>
+        <h1><span class="swatch-lg" style="background:${s.color}"></span>${s.emoji ? esc(s.emoji)+' ' : ''}${esc(s.name)}${examBadgeHtml}</h1>
+        <div class="meta">${totalCount} fiche${totalCount===1?'':'s'}${s.archived ? '' : ' · #'+pad2(activeRank(id)+1)+' par importance'}</div>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        ${totalCount ? `<button class="btn ghost small" onclick="openFlashcards('${s.id}')">🃏 Réviser</button>` : ''}
+        ${totalCount ? `<button class="btn ghost small" onclick="openPresentation('${s.id}')">👥 Présentation à deux</button>` : ''}
+        ${totalCount ? `<button class="btn ghost small" onclick="openPrintView('${s.id}')">🖨️ Imprimer</button>` : ''}
+        ${totalCount ? `<button class="btn" onclick="openAddFiche('${s.id}')">+ Ajouter une fiche</button>` : ''}
+      </div>
+    </div>
+    ${totalCount ? sortFilterBarHtml() : ''}
+    ${body}
+    ${totalCount ? `<details class="history-section">
+      <summary>☁️ Nuage de mots-clés</summary>
+      <div style="margin-top:14px;">${renderWordCloud(id)}</div>
+    </details>` : ''}
+  `;
+}
+
+function jsQuote(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+
+function renderFicheDetail(id){
+  const f = getFiche(id);
+  if(!f) return renderHome();
+  const s = getSubject(f.subjectId);
+  if(readingMode){
+    return `
+      <div class="reading-mode">
+        <button class="back-link no-print" onclick="toggleReadingMode()">✕ Quitter le mode lecture</button>
+        <button class="btn ghost small no-print" style="margin-bottom:20px;" onclick="toggleSpeech('${f.id}')">${isSpeaking() ? '⏹️ Arrêter la lecture' : '🔊 Lire à voix haute'}</button>
+        <h1 class="fiche-title">${f.pinned ? '📌 ' : ''}${esc(f.title)}</h1>
+        ${f.chapter ? `<div class="fiche-date">📂 ${esc(f.chapter)}</div>` : ''}
+        ${renderAttachmentsGallery(f)}
+        <div class="fiche-content md-content">${renderMarkdownLite(f.content)}</div>
+        ${f.sources ? `<p class="fiche-sources">📚 Sources : ${esc(f.sources)}</p>` : ''}
+      </div>
+    `;
+  }
+  const chapterHtml = f.chapter ? `<div class="fiche-date">📂 ${esc(f.chapter)}</div>` : '';
+  const tagsHtml = (f.tags && f.tags.length) ? `<div class="fiche-tags">${f.tags.map(t=>`<button type="button" class="tag-chip" onclick="openTagView('${jsQuote(t)}')">🏷️ ${esc(t)}</button>`).join('')}</div>` : '';
+  const linkedFiches = (f.links||[]).map(lid=>getFiche(lid)).filter(Boolean);
+  const linksHtml = linkedFiches.length ? `
+    <div class="linked-fiches">
+      <div class="linked-label">Voir aussi</div>
+      ${linkedFiches.map(lf=>`<button type="button" class="link-chip" onclick="openFiche('${lf.id}')">${esc(lf.title)}</button>`).join('')}
+    </div>` : '';
+  const history = Array.isArray(f.history) ? [...f.history].reverse() : [];
+  const historyHtml = history.length ? `
+    <details class="history-section">
+      <summary>🕐 Historique (${history.length} version${history.length===1?'':'s'} précédente${history.length===1?'':'s'})</summary>
+      ${history.map((h,i)=>{
+        const realIdx = f.history.length-1-i;
+        return `<div class="history-item">
+          <div class="history-date">${fmtDate(h.date)}</div>
+          <div class="history-title">${esc(h.title)}</div>
+          <button type="button" class="btn ghost small" onclick="restoreVersion('${f.id}', ${realIdx})">↺ Restaurer cette version</button>
+        </div>`;
+      }).join('')}
+    </details>` : '';
+  const otherFichesOptions = data.subjects.map(sub=>{
+    const opts = data.fiches.filter(o=>o.subjectId===sub.id && o.id!==f.id).map(o=>`<option value="${o.id}">${esc(o.title)}</option>`).join('');
+    return opts ? `<optgroup label="${esc(sub.name)}">${opts}</optgroup>` : '';
+  }).join('');
+  const mergeHtml = mergePanelOpen ? `
+    <div class="reset-confirm-box" style="border-color:var(--border); margin-top:20px;">
+      <p style="font-size:0.85rem; color:var(--ink-soft); margin:0 0 10px;">Choisis la fiche qui recevra le contenu de celle-ci (elle sera supprimée après la fusion) :</p>
+      <select id="merge-target-select">${otherFichesOptions}</select>
+      <div class="form-actions">
+        <button class="btn" onclick="mergeFicheInto('${f.id}', document.getElementById('merge-target-select').value)">Fusionner</button>
+        <button class="btn ghost" onclick="toggleMergePanel()">Annuler</button>
+      </div>
+    </div>` : '';
+  return `
+    <button class="back-link" onclick="goToSubject('${f.subjectId}')">← ${s ? esc(s.name) : 'Retour'}</button>
+    <div class="fiche-detail" style="--tape-color:${s ? s.color : 'var(--accent)'}">
+      <h1 class="fiche-title">${f.pinned ? '📌 ' : ''}${esc(f.title)}</h1>
+      <div class="fiche-date">Ajoutée le ${fmtDate(f.dateAdded)}${f.dateEdited ? ' · modifiée le ' + fmtDate(f.dateEdited) : ''}</div>
+      ${chapterHtml}
+      ${tagsHtml}
+      ${confidenceRowHtml(f)}
+      <div class="status-row">
+        <button class="status-btn ${f.pinned?'active':''}" onclick="togglePin('${f.id}')">📌 ${f.pinned ? 'Désépingler' : 'Épingler'}</button>
+      </div>
+      ${renderAttachmentsGallery(f)}
+      <div class="fiche-content md-content">${renderMarkdownLite(f.content)}</div>
+      ${f.sources ? `<p class="fiche-sources">📚 Sources : ${esc(f.sources)}</p>` : ''}
+      ${linksHtml}
+      ${historyHtml}
+      ${mergeHtml}
+      <div class="fiche-actions">
+        <button class="btn ghost" onclick="toggleReadingMode()">📖 Mode lecture</button>
+        <button class="btn ghost" onclick="toggleSpeech('${f.id}')">${isSpeaking() ? '⏹️ Arrêter la lecture' : '🔊 Lire à voix haute'}</button>
+        ${parseQuiz(f.quiz).length ? `<button class="btn ghost" onclick="openQuiz('${f.id}')">❓ Mode quiz</button>` : ''}
+        <button class="btn ghost" onclick="openPrintFiche('${f.id}')">🖨️ Exporter en PDF</button>
+        <button class="btn ghost" onclick="shareFiche('${f.id}')">📤 Partager</button>
+        <button class="btn ghost" onclick="toggleMergePanel()">🔗 Fusionner avec...</button>
+        <button class="btn ghost" onclick="openEditFiche('${f.id}')">Modifier</button>
+        <button class="btn ghost" onclick="deleteFiche('${f.id}')">Supprimer cette fiche</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderPrintView(subjectId){
+  const s = getSubject(subjectId);
+  if(!s) return renderHome();
+  const fiches = fichesOf(subjectId);
+  const fichesHtml = fiches.map(f=>{
+    const imgs = migrateAttachments(f).filter(a=>a.type==='image').map(a=>`<img src="${a.url||a.dataUrl}" class="print-img" alt="">`).join('');
+    return `<div class="print-fiche">
+      <h2>${esc(f.title)}</h2>
+      <div class="print-content md-content">${renderMarkdownLite(f.content)}</div>
+      ${imgs}
+    </div>`;
+  }).join('');
+  return `
+    <div class="no-print" style="margin-bottom:24px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <button class="back-link" onclick="goToSubject('${subjectId}')" style="margin-bottom:0;">← Retour</button>
+      <button class="btn" onclick="window.print()">🖨️ Imprimer / Enregistrer en PDF</button>
+    </div>
+    <h1 class="print-title">${esc(s.name)}</h1>
+    ${fichesHtml || '<p>Aucune fiche à imprimer.</p>'}
+  `;
+}
+
+function renderPrintFiche(ficheId){
+  const f = getFiche(ficheId);
+  if(!f) return renderHome();
+  const imgs = migrateAttachments(f).filter(a=>a.type==='image').map(a=>`<img src="${a.url||a.dataUrl}" class="print-img" alt="">`).join('');
+  const sourcesHtml = f.sources ? `<p class="print-sources">Sources : ${esc(f.sources)}</p>` : '';
+  return `
+    <div class="no-print" style="margin-bottom:24px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <button class="back-link" onclick="openFiche('${f.id}')" style="margin-bottom:0;">← Retour</button>
+      <button class="btn" onclick="window.print()">🖨️ Imprimer / Enregistrer en PDF</button>
+    </div>
+    <h1 class="print-title">${esc(f.title)}</h1>
+    <div class="print-fiche">
+      <div class="print-content md-content">${renderMarkdownLite(f.content)}</div>
+      ${imgs}
+      ${sourcesHtml}
+    </div>
+  `;
+}
+
+function renderFlashcards(view){
+  const s = getSubject(view.subjectId);
+  if(!s) return renderHome();
+  const list = visibleFichesOf(view.subjectId);
+  if(!list.length) return renderSubjectView(view.subjectId);
+  const idx = Math.min(view.index, list.length-1);
+  const f = list[idx];
+  return `
+    <button class="back-link" onclick="goToSubject('${s.id}')">← ${esc(s.name)}</button>
+    <label class="checkbox-row no-print" style="justify-content:center;">
+      <input type="checkbox" ${flashcardTimerEnabled?'checked':''} onchange="toggleFlashcardTimerPref()">
+      <span>⏱️ Révéler automatiquement après 15 secondes</span>
+    </label>
+    <div class="flashcard-progress">Carte ${idx+1} / ${list.length}${(!view.revealed && flashcardTimerEnabled) ? ` · <span id="flashcard-countdown">${flashcardSecondsLeft}s</span>` : ''}</div>
+    <div class="flashcard">
+      <h2 class="flashcard-title">${esc(f.title)}</h2>
+      ${view.revealed ? `
+        ${f.chapter ? `<div class="fiche-date">📂 ${esc(f.chapter)}</div>` : ''}
+        ${renderAttachmentsGallery(f)}
+        <div class="fiche-content md-content">${renderMarkdownLite(f.content)}</div>
+      ` : `<button class="btn" onclick="flashcardReveal()">👁️ Révéler la réponse</button>`}
+    </div>
+    ${view.revealed ? `<div style="display:flex; justify-content:center;">${confidenceRowHtml(f)}</div>` : ''}
+    <div class="flashcard-nav">
+      <button class="btn ghost" onclick="flashcardPrev()" ${idx===0?'disabled':''}>← Précédente</button>
+      <button class="btn" onclick="flashcardNext()" ${idx===list.length-1?'disabled':''}>Suivante →</button>
+    </div>
+  `;
+}
+
+function renderPresentation(view){
+  const s = getSubject(view.subjectId);
+  if(!s) return renderHome();
+  const list = visibleFichesOf(view.subjectId);
+  if(!list.length) return renderSubjectView(view.subjectId);
+  const idx = Math.min(view.index, list.length-1);
+  const f = list[idx];
+  return `
+    <div class="presentation-mode">
+      <button class="back-link no-print" onclick="goToSubject('${s.id}')">✕ Quitter le mode présentation</button>
+      <div class="presentation-progress">${esc(s.name)} · ${idx+1} / ${list.length}</div>
+      <h1 class="presentation-title">${esc(f.title)}</h1>
+      ${renderAttachmentsGallery(f)}
+      <div class="presentation-content md-content">${renderMarkdownLite(f.content)}</div>
+      <div class="presentation-nav">
+        <button class="btn ghost presentation-nav-btn" onclick="presentationPrev()" ${idx===0?'disabled':''}>← Précédente</button>
+        <button class="btn presentation-nav-btn" onclick="presentationNext()" ${idx===list.length-1?'disabled':''}>Suivante →</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderQuiz(view){
+  const f = getFiche(view.ficheId);
+  if(!f) return renderHome();
+  const pairs = parseQuiz(f.quiz);
+  if(!pairs.length) return renderFicheDetail(f.id);
+  const idx = Math.min(view.index, pairs.length-1);
+  const pair = pairs[idx];
+  return `
+    <button class="back-link" onclick="openFiche('${f.id}')">← ${esc(f.title)}</button>
+    <div class="flashcard-progress">Question ${idx+1} / ${pairs.length}</div>
+    <div class="flashcard">
+      <h2 class="flashcard-title">${esc(pair.q)}</h2>
+      ${view.revealed ? `<div class="fiche-content">${esc(pair.a)}</div>` : `<button class="btn" onclick="quizReveal()">👁️ Voir la réponse</button>`}
+    </div>
+    <div class="flashcard-nav">
+      <button class="btn ghost" onclick="quizPrev()" ${idx===0?'disabled':''}>← Précédente</button>
+      <button class="btn" onclick="quizNext()" ${idx===pairs.length-1?'disabled':''}>Suivante →</button>
+    </div>
+  `;
+}
+
+function renderPomodoro(){
+  return `
+    <p class="eyebrow">Concentration</p>
+    <h1 class="hero" style="font-size:2rem;">⏱️ Minuteur</h1>
+    <div class="pomodoro-modes">
+      <button class="btn ${pomodoroState.mode==='travail'?'':'ghost'} small" onclick="pomodoroSetMode('travail')">Travail (25 min)</button>
+      <button class="btn ${pomodoroState.mode==='pause'?'':'ghost'} small" onclick="pomodoroSetMode('pause')">Pause (5 min)</button>
+    </div>
+    <div class="pomodoro-display">
+      <div class="pomodoro-time" id="pomodoro-time">${formatPomodoroTime(pomodoroState.seconds)}</div>
+      <div class="pomodoro-label">${pomodoroState.mode==='travail' ? 'Séance de travail' : 'Pause'}</div>
+    </div>
+    <div class="flashcard-nav">
+      <button class="btn" onclick="pomodoroToggle()">${pomodoroState.running ? '⏸️ Pause' : '▶️ Démarrer'}</button>
+      <button class="btn ghost" onclick="pomodoroReset()">↺ Réinitialiser</button>
+    </div>
+  `;
+}
+
+function renderStats(){
+  const buckets = weeklyAddCounts(8);
+  const max = Math.max(1, ...buckets.map(b=>b.count));
+  const bars = buckets.map(b=>{
+    const h = 4 + Math.round((b.count/max)*90);
+    const label = b.end.toLocaleDateString('fr-FR',{day:'numeric', month:'short'});
+    return `<div class="chart-bar-wrap"><div class="chart-bar" style="height:${h}px" title="${b.count} fiche${b.count===1?'':'s'}"></div><div class="chart-bar-label">${label}</div></div>`;
+  }).join('');
+  const streak = currentStreak();
+  const weekCount = currentWeekCount();
+  const goalPct = Math.min(100, Math.round((weekCount/weeklyGoal)*100));
+  return `
+    <p class="eyebrow">Suivi & motivation</p>
+    <h1 class="hero" style="font-size:2rem;">📊 Ton parcours</h1>
+
+    <div class="stats-row">
+      <div class="stat"><div class="num">🔥 ${streak}</div><div class="label">Jour${streak===1?'':'s'} d'affilée</div></div>
+      <div class="stat"><div class="num">🏆 ${xpLevel()}</div><div class="label">Niveau (${xpTotal} XP)</div></div>
+    </div>
+
+    <div class="howitworks">
+      <h2>🏅 Badges</h2>
+      <div class="badge-grid">${badgeGridHtml()}</div>
+    </div>
+
+    <div class="howitworks">
+      <h2>Fiches ajoutées par semaine</h2>
+      <div class="weekly-chart">${bars}</div>
+    </div>
+
+    <div class="howitworks">
+      <h2>Objectif de la semaine</h2>
+      <div class="goal-row">
+        <div class="goal-bar-track"><div class="goal-bar-fill" style="width:${goalPct}%"></div></div>
+        <div class="goal-text">${weekCount} / ${weeklyGoal} fiches cette semaine</div>
+      </div>
+      <div class="goal-edit">
+        <label for="goal-input">Objectif hebdomadaire :</label>
+        <input type="number" id="goal-input" min="1" max="50" value="${weeklyGoal}" onchange="setWeeklyGoal(parseInt(this.value,10))">
+      </div>
+    </div>
+
+    <div class="howitworks">
+      <h2>Détail par matière</h2>
+      <div class="table-scroll">
+        <table class="md-table subject-stats-table">
+          <tr><th>Matière</th><th>Fiches</th><th>Maîtrisé</th><th>À revoir</th><th>Révisions</th></tr>
+          ${subjectStatsRows()}
+        </table>
+      </div>
+      <p style="font-size:0.75rem; color:var(--ink-faint); margin:10px 0 0;">« Révisions » compte le nombre de fois où tu as noté ta confiance sur une fiche de cette matière (≈ temps de révision).</p>
+    </div>
+  `;
+}
+
+// ---------- Badges à débloquer ----------
+function computeBadges(){
+  const total = data.fiches.length;
+  const streak = currentStreak();
+  const masteredSubject = activeSubjects().some(s=>isSubjectFullyMastered(s.id));
+  return [
+    { emoji:'🌱', name:'Premiers pas', desc:'Créer ta première fiche', unlocked: total>=1 },
+    { emoji:'📚', name:'10 fiches', desc:'Atteindre 10 fiches au total', unlocked: total>=10 },
+    { emoji:'📖', name:'50 fiches', desc:'Atteindre 50 fiches au total', unlocked: total>=50 },
+    { emoji:'🎓', name:'100 fiches', desc:'Atteindre 100 fiches au total', unlocked: total>=100 },
+    { emoji:'🔥', name:'Série de 7 jours', desc:"Une semaine d'affilée sur le site", unlocked: streak>=7 },
+    { emoji:'🔥🔥', name:'Série de 30 jours', desc:"Un mois d'affilée sur le site", unlocked: streak>=30 },
+    { emoji:'🏅', name:'Matière maîtrisée', desc:'100% des fiches maîtrisées dans une matière', unlocked: masteredSubject },
+    { emoji:'⭐', name:'Niveau 5', desc:'Atteindre le niveau 5 (400 XP)', unlocked: xpLevel()>=5 }
+  ];
+}
+function badgeGridHtml(){
+  return computeBadges().map(b=>`
+    <div class="badge-chip ${b.unlocked?'unlocked':''}">
+      <div class="badge-emoji">${b.emoji}</div>
+      <div class="badge-name">${esc(b.name)}</div>
+      <div class="badge-desc">${esc(b.desc)}</div>
+    </div>
+  `).join('');
+}
+
+function subjectStatsRows(){
+  return activeSubjects().map(s=>{
+    const fiches = fichesOf(s.id);
+    const total = fiches.length;
+    const mastered = fiches.filter(f=>f.confidence!==undefined && f.confidence>=4).length;
+    const due = fiches.filter(f=>isDueForReview(f)).length;
+    const reviews = fiches.reduce((sum,f)=>sum+(f.reviewCount||0),0);
+    const minutes = Math.round(reviews*0.5);
+    return `<tr>
+      <td><span class="swatch" style="background:${s.color}"></span> ${esc(s.name)}</td>
+      <td>${total}</td>
+      <td>${total ? Math.round(mastered/total*100) : 0}%</td>
+      <td>${due}</td>
+      <td>${reviews} (≈${minutes} min)</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderFicheForm(opts){
+  opts = opts || {};
+  const editing = !!opts.ficheId;
+  const f = editing ? getFiche(opts.ficheId) : null;
+  if(editing && !f) return renderHome();
+  const initialSubject = editing ? f.subjectId : (opts.subjectId || lastSubjectId || (data.subjects[0] && data.subjects[0].id));
+  const initialTitle = editing ? f.title : '';
+  const initialContent = editing ? f.content : '';
+  const initialChapter = editing ? (f.chapter || '') : '';
+  const initialQuiz = editing ? (f.quiz || '') : '';
+  const initialSources = editing ? (f.sources || '') : '';
+  const initialLinks = editing ? (f.links || []) : [];
+  const initialTags = editing ? (f.tags || []) : [];
+  const options = data.subjects.map(s=>`<option value="${s.id}" ${s.id===initialSubject?'selected':''}>${esc(s.name)}</option>`).join('');
+  const backTarget = editing ? `goToSubject('${f.subjectId}')` : (opts.subjectId ? `goToSubject('${opts.subjectId}')` : 'goHome()');
+  const linkOptions = data.subjects.map(s=>{
+    const opts2 = fichesOf(s.id).filter(o=>!editing || o.id!==f.id)
+      .map(o=>`<option value="${o.id}" ${initialLinks.includes(o.id)?'selected':''}>${esc(o.title)}</option>`).join('');
+    return opts2 ? `<optgroup label="${esc(s.name)}">${opts2}</optgroup>` : '';
+  }).join('');
+  const subjectChapters = Array.from(new Set(fichesOf(initialSubject).map(o=>o.chapter).filter(Boolean)));
+  const chapterDatalist = `<datalist id="chapter-suggestions">${subjectChapters.map(c=>`<option value="${esc(c)}">`).join('')}</datalist>`;
+
+  return `
+    <button class="back-link" onclick="${backTarget}">← Retour</button>
+    <div class="form-panel">
+      <h1>${editing ? 'Modifier la fiche' : 'Ajouter une fiche'}</h1>
+      ${!editing ? `
+      <button type="button" class="btn smart-paste-btn" onclick="applyFullPaste()">✨ Coller une fiche complète (contenu + quiz + liens)</button>
+      <p class="smart-paste-hint">Fonctionne avec une fiche que Claude t'a donnée au format ### TITRE / ### CHAPITRE / ### CONTENU / ### QUIZ / ### SOURCES / ### LIENS.</p>
+      ` : ''}
+      <form onsubmit="submitFiche(event)"${editing ? ` data-edit-id="${f.id}"` : ''}>
+        <div class="field">
+          <label for="f-subject">Matière</label>
+          <select id="f-subject" name="subjectId" onchange="lastSubjectId=this.value">${options}</select>
+        </div>
+        <div class="field">
+          <label for="f-title">Titre (facultatif)</label>
+          <input type="text" id="f-title" name="titleOverride" placeholder="Laisse vide pour utiliser la première ligne du contenu comme titre" value="${esc(initialTitle)}">
+        </div>
+        <div class="field">
+          <label for="f-chapter">Chapitre (facultatif)</label>
+          <input type="text" id="f-chapter" name="chapter" list="chapter-suggestions" placeholder="Ex. : Chapitre 3 — Les dérivées" value="${esc(initialChapter)}">
+          ${chapterDatalist}
+        </div>
+        <div class="field">
+          <label for="f-tags">Étiquettes (facultatif, séparées par des virgules)</label>
+          <input type="text" id="f-tags" name="tags" placeholder="Ex. : important, oral, formule" value="${esc(initialTags.join(', '))}">
+        </div>
+        <div class="field">
+          <label for="f-raw">Contenu de la fiche</label>
+          <div class="paste-row">
+            <button type="button" class="btn ghost small" onclick="pasteFromClipboard()">📋 Coller depuis le presse-papiers</button>
+          </div>
+          <textarea id="f-raw" name="content" placeholder="Colle ou écris le contenu de ta fiche ici. Astuce : **gras**, lignes commençant par - pour une liste, $x^2$ pour une formule.">${esc(initialContent)}</textarea>
+        </div>
+        <div class="field">
+          <label>Photos, fichiers ou audio (facultatif, plusieurs possibles)</label>
+          <div class="attach-row">
+            <button type="button" class="btn ghost small" onclick="document.getElementById('photo-input').click()">📷 Ajouter une photo</button>
+            <button type="button" class="btn ghost small" onclick="document.getElementById('file-input').click()">📎 Ajouter un fichier</button>
+            <button type="button" class="btn ghost small" id="record-btn" onclick="toggleRecording()">🎤 Enregistrer un audio</button>
+          </div>
+          <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhotoInput(event)">
+          <input type="file" id="file-input" accept="image/*,.pdf" style="display:none" onchange="handleFileInput(event)">
+          <div id="attachment-preview" class="attach-preview-list">${attachmentPreviewHtml()}</div>
+        </div>
+        <div class="field">
+          <label for="f-quiz">Questions de quiz (facultatif)</label>
+          <textarea id="f-quiz" name="quiz" placeholder="Une question par ligne, réponse après une barre verticale. Ex. : Capitale de la France ? | Paris" style="min-height:90px;">${esc(initialQuiz)}</textarea>
+        </div>
+        <div class="field">
+          <label for="f-sources">Sources (facultatif)</label>
+          <input type="text" id="f-sources" name="sources" placeholder="Ex. : Manuel p.42, cours du 12/03" value="${esc(initialSources)}">
+        </div>
+        <div class="field">
+          <label for="f-links">Fiches liées (facultatif, « voir aussi »)</label>
+          <select id="f-links" name="links" multiple size="5">${linkOptions}</select>
+          <div style="font-size:0.75rem; color:var(--ink-faint); margin-top:4px;">Ctrl/Cmd + clic pour en choisir plusieurs.</div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn">${editing ? 'Enregistrer les modifications' : 'Enregistrer la fiche'}</button>
+          <button type="button" class="btn ghost" onclick="${backTarget}">Annuler</button>
+        </div>
+      </form>
+
+    </div>
+  `;
+}
+
+function renderAddSubjectForm(){
+  const swatchesHtml = SWATCHES.map(hex=>
+    `<div class="swatch-option ${hex===pickedColor?'selected':''}" style="background:${hex}" onclick="pickColor('${hex}')"></div>`
+  ).join('');
+  return `
+    <button class="back-link" onclick="goHome()">← Retour</button>
+    <div class="form-panel">
+      <h1>Nouvelle matière</h1>
+      <form onsubmit="submitSubject(event)">
+        <div class="field">
+          <label for="s-name">Nom de la matière</label>
+          <input type="text" id="s-name" name="subjectName" placeholder="Ex. : SVT" required>
+        </div>
+        <div class="field">
+          <label for="s-code">Code court (affiché sur l'onglet)</label>
+          <input type="text" id="s-code" name="code" placeholder="Ex. : SVT" maxlength="5">
+        </div>
+        <div class="field">
+          <label for="s-emoji">Emoji (facultatif)</label>
+          <input type="text" id="s-emoji" name="emoji" placeholder="Ex. : 🧬" maxlength="8" style="max-width:100px;">
+        </div>
+        <div class="field">
+          <label for="s-examdate">Date de contrôle (facultatif)</label>
+          <input type="date" id="s-examdate" name="examDate" style="max-width:200px;">
+        </div>
+        <div class="field">
+          <label>Couleur de l'onglet</label>
+          <div class="swatch-picker">${swatchesHtml}</div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn">Créer la matière</button>
+          <button type="button" class="btn ghost" onclick="goHome()">Annuler</button>
+        </div>
+      </form>
+    </div>
+  `;
+}
+
+function renderManageSubjects(){
+  const active = activeSubjects();
+  const archived = data.subjects.filter(s=>s.archived);
+  const rows = active.map((s,i)=>{
+    const count = fichesOf(s.id).length;
+    return `<div class="manage-row" draggable="true" ondragstart="handleDragStart('${s.id}')" ondragover="handleDragOver(event)" ondrop="handleDrop(event,'${s.id}')">
+      <span class="drag-handle" title="Glisser pour réordonner">⠿</span>
+      <span class="swatch" style="background:${s.color}"></span>
+      <span class="manage-name">${pad2(i+1)}. ${s.emoji ? esc(s.emoji)+' ' : ''}${esc(s.name)} <span class="manage-count">(${count} fiche${count===1?'':'s'})</span></span>
+      <div class="manage-actions">
+        <button type="button" class="btn ghost small" onclick="moveSubject('${s.id}',-1)" ${i===0?'disabled':''} aria-label="Monter dans l'ordre">↑</button>
+        <button type="button" class="btn ghost small" onclick="moveSubject('${s.id}',1)" ${i===active.length-1?'disabled':''} aria-label="Descendre dans l'ordre">↓</button>
+        <button type="button" class="btn ghost small" onclick="openEditSubject('${s.id}')">Renommer</button>
+        <button type="button" class="btn ghost small" onclick="toggleArchiveSubject('${s.id}')">📦 Archiver</button>
+        <button type="button" class="btn ghost small" onclick="deleteSubject('${s.id}')">Supprimer</button>
+      </div>
+    </div>`;
+  }).join('');
+  const archivedRows = archived.map(s=>{
+    const count = fichesOf(s.id).length;
+    return `<div class="manage-row">
+      <span class="swatch" style="background:${s.color}"></span>
+      <span class="manage-name">${s.emoji ? esc(s.emoji)+' ' : ''}${esc(s.name)} <span class="manage-count">(${count} fiche${count===1?'':'s'})</span></span>
+      <div class="manage-actions">
+        <button type="button" class="btn ghost small" onclick="toggleArchiveSubject('${s.id}')">📤 Désarchiver</button>
+        <button type="button" class="btn ghost small" onclick="deleteSubject('${s.id}')">Supprimer</button>
+      </div>
+    </div>`;
+  }).join('');
+  return `
+    <button class="back-link" onclick="goHome()">← Retour</button>
+    <div class="form-panel" style="max-width:760px;">
+      <h1>Gérer les matières</h1>
+      <p style="color:var(--ink-soft); font-size:0.88rem; margin-top:-16px; margin-bottom:20px;">Glisse une matière (⠿) pour la réordonner, ou utilise les flèches. L'ordre est celui utilisé partout dans le site.</p>
+      <div class="manage-list">${rows}</div>
+      <div class="form-actions"><button type="button" class="btn" onclick="openAddSubject()">+ Nouvelle matière</button></div>
+      ${archived.length ? `
+      <h2 style="margin-top:30px;">Matières archivées</h2>
+      <div class="manage-list">${archivedRows}</div>` : ''}
+    </div>
+  `;
+}
+
+function renderEditSubjectForm(id){
+  const s = getSubject(id);
+  if(!s) return renderManageSubjects();
+  const swatchesHtml = SWATCHES.map(hex=>
+    `<div class="swatch-option ${hex===pickedColor?'selected':''}" style="background:${hex}" onclick="pickColor('${hex}')"></div>`
+  ).join('');
+  return `
+    <button class="back-link" onclick="openManageSubjects()">← Retour</button>
+    <div class="form-panel">
+      <h1>Modifier « ${esc(s.name)} »</h1>
+      <form onsubmit="submitEditSubject(event)" data-edit-id="${s.id}">
+        <div class="field">
+          <label for="es-name">Nom</label>
+          <input type="text" id="es-name" name="subjectName" value="${esc(s.name)}" required>
+        </div>
+        <div class="field">
+          <label for="es-code">Code court</label>
+          <input type="text" id="es-code" name="code" value="${esc(s.code)}" maxlength="5">
+        </div>
+        <div class="field">
+          <label for="es-emoji">Emoji (facultatif)</label>
+          <input type="text" id="es-emoji" name="emoji" value="${esc(s.emoji||'')}" placeholder="Ex. : 🧬" maxlength="8" style="max-width:100px;">
+        </div>
+        <div class="field">
+          <label for="es-examdate">Date de contrôle (facultatif)</label>
+          <input type="date" id="es-examdate" name="examDate" value="${esc(s.examDate||'')}" style="max-width:200px;">
+        </div>
+        <div class="field">
+          <label>Couleur</label>
+          <div class="swatch-picker">${swatchesHtml}</div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn">Enregistrer</button>
+          <button type="button" class="btn ghost" onclick="openManageSubjects()">Annuler</button>
+        </div>
+      </form>
+    </div>
+  `;
+}
+
+// ---------- Glisser pour supprimer (mobile) ----------
+let swipeStartX = null;
+let swipeCardEl = null;
+document.addEventListener('touchstart', (e)=>{
+  const card = e.target.closest('.fiche-card');
+  if(!card) return;
+  swipeStartX = e.touches[0].clientX;
+  swipeCardEl = card;
+  swipeCardEl.style.transition = 'none';
+}, {passive:true});
+document.addEventListener('touchmove', (e)=>{
+  if(!swipeCardEl || swipeStartX===null) return;
+  const dx = e.touches[0].clientX - swipeStartX;
+  if(dx < 0){
+    swipeCardEl.style.transform = `translateX(${Math.max(dx,-110)}px)`;
+    swipeCardEl.style.opacity = String(Math.max(0.3, 1 + dx/220));
+  }
+}, {passive:true});
+document.addEventListener('touchend', ()=>{
+  if(!swipeCardEl){ swipeStartX = null; return; }
+  const match = /translateX\((-?\d+(?:\.\d+)?)px\)/.exec(swipeCardEl.style.transform || '');
+  const dx = match ? parseFloat(match[1]) : 0;
+  const card = swipeCardEl;
+  card.style.transition = 'transform 150ms ease, opacity 150ms ease';
+  if(dx < -70){
+    const id = card.getAttribute('data-fiche-id');
+    card.style.transform = 'translateX(-100%)';
+    card.style.opacity = '0';
+    setTimeout(()=>{ if(id) deleteFiche(id); }, 140);
+  }else{
+    card.style.transform = '';
+    card.style.opacity = '';
+  }
+  swipeStartX = null;
+  swipeCardEl = null;
+});
+
+initTheme();
+initPalette();
+initHighContrast();
+initReduceMotion();
+initOnlineStatus();
+initFontPairing();
+initFontSize();
+initRailCollapse();
+initWeeklyGoal();
+initSchedule();
+initXP();
+initHomeBlockOrder();
+initFlashcardTimerPref();
+loadData();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(e => console.log('SW non enregistré', e));
+  });
+}
+</script>
+</body>
+</html>
