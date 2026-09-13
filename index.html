@@ -655,7 +655,9 @@ function isTableRow(line){ return /^\s*\|.*\|\s*$/.test(line); }
 function isTableSep(line){ return /^\s*\|?[\s:|-]+\|?\s*$/.test(line) && line.includes('-'); }
 
 function renderMarkdownLite(text){
-  const escaped = esc(text);
+  const escaped = esc(text)
+    .replace(/&lt;u&gt;/g, '<u>')
+    .replace(/&lt;\/u&gt;/g, '</u>');
   const lines = escaped.split('\n');
   const hl = { n: 0 };
   let html = '';
