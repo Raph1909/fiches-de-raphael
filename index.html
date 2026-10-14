@@ -547,6 +547,31 @@
   .font-option.selected{ border-color: var(--accent); color: var(--accent); }
   .font-option .font-option-name{ font-size:0.68rem; text-transform:uppercase; letter-spacing:0.4px; opacity:0.7; display:block; margin-bottom:2px; }
 
+  /* ---------- Carte mentale : correctifs + version téléphone ---------- */
+  .mm-wrap.mm-wrap-fullscreen{ max-height:none; min-height:0; display:flex; align-items:stretch; justify-content:flex-start; overflow:auto; }
+  .mm-wrap-fullscreen .mm-inner{ margin:auto; }
+  @media (min-width: 761px){ .mm-branch-row{ gap:48px; } }
+  @media (max-width: 760px){
+    .mm-lines{ display:none; }
+    .mm-inner{ display:block; width:100%; }
+    .mm-body{ flex-direction:column; align-items:stretch; gap:14px; padding:16px 14px; }
+    .mm-root{ white-space:normal; text-align:center; }
+    .mm-branches{ gap:16px; }
+    .mm-branch-row{ flex-direction:column; align-items:stretch; gap:8px; }
+    .mm-branch{ white-space:normal; }
+    .mm-leaves{ margin-left:12px; padding-left:12px; border-left:3px solid var(--mm-color, var(--border)); }
+    .mm-wrap.mm-wrap-fullscreen{ max-height:none; }
+  }
+
+  /* ---------- Frise chronologique ---------- */
+  .tl{ list-style:none; margin:8px 0 0 6px; padding:0 0 0 22px; border-left:3px solid var(--accent); }
+  .tl-item{ position:relative; padding:0 0 18px 16px; }
+  .tl-item::before{ content:''; position:absolute; left:-31px; top:5px; width:14px; height:14px; border-radius:50%;
+    background:var(--paper-card); border:3px solid var(--accent); }
+  .tl-date{ font-family:var(--font-display); text-transform:uppercase; color:var(--accent); font-size:1rem; letter-spacing:0.4px; }
+  .tl-text{ font-size:0.92rem; line-height:1.5; margin-top:2px; }
+  .tl-link{ margin:8px 0 0; font-size:0.74rem; padding:4px 10px; }
+
   @media print{
     .rail, .fab, .no-print{ display:none !important; }
     .layout{ display:block; }
@@ -1047,7 +1072,7 @@ function renderMindmapHtml(ficheId){
     }).join('');
     return `<div class="mm-branch-row">
       <div class="mm-node mm-branch" data-mm-id="${branchId}" data-mm-parent="${rootId}" data-mm-color="${color}" style="background:${color};border-color:${color}">${esc(branch.label)}</div>
-      ${leavesHtml ? `<div class="mm-leaves">${leavesHtml}</div>` : ''}
+      ${leavesHtml ? `<div class="mm-leaves" style="--mm-color:${color}">${leavesHtml}</div>` : ''}
     </div>`;
   }).join('');
   return `<div class="mm-inner">
@@ -1077,24 +1102,29 @@ function populateMindmapWrap(wrapEl){
   const inner = wrapEl.querySelector('.mm-inner');
   const svg = wrapEl.querySelector('.mm-lines');
   if(!inner || !svg) return;
-  const innerRect = inner.getBoundingClientRect();
-  if(!innerRect.width || !innerRect.height) return;
-  svg.setAttribute('width', innerRect.width);
-  svg.setAttribute('height', innerRect.height);
+  const iw = inner.offsetWidth, ih = inner.offsetHeight;
+  if(!iw || !ih) return;
+  svg.setAttribute('width', iw);
+  svg.setAttribute('height', ih);
   const paths = [];
   inner.querySelectorAll('[data-mm-parent]').forEach(childEl=>{
     const parentId = childEl.getAttribute('data-mm-parent');
     const parentEl = inner.querySelector(`[data-mm-id="${parentId}"]`);
     if(!parentEl) return;
-    const pr = parentEl.getBoundingClientRect();
-    const cr = childEl.getBoundingClientRect();
-    const x1 = pr.right - innerRect.left, y1 = pr.top + pr.height/2 - innerRect.top;
-    const x2 = cr.left - innerRect.left, y2 = cr.top + cr.height/2 - innerRect.top;
+    const pr = mmPos(parentEl, inner);
+    const cr = mmPos(childEl, inner);
+    const x1 = pr.x + pr.w, y1 = pr.y + pr.h/2;
+    const x2 = cr.x, y2 = cr.y + cr.h/2;
     const mx = (x1+x2)/2;
     const color = childEl.getAttribute('data-mm-color') || 'var(--ink-faint)';
     paths.push(`<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)} C ${mx.toFixed(1)} ${y1.toFixed(1)}, ${mx.toFixed(1)} ${y2.toFixed(1)}, ${x2.toFixed(1)} ${y2.toFixed(1)}" stroke="${color}" stroke-width="2.2" fill="none" opacity="0.75"/>`);
   });
   svg.innerHTML = paths.join('');
+}
+function mmPos(el, root){
+  let x = 0, y = 0, n = el;
+  while(n && n !== root){ x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+  return { x, y, w: el.offsetWidth, h: el.offsetHeight };
 }
 function populateAllMindmaps(){
   document.querySelectorAll('.mm-wrap[data-fiche-id]').forEach(populateMindmapWrap);
@@ -1120,6 +1150,79 @@ function renderMindmapFullscreenOverlay(){
     <h2 class="mindmap-fullscreen-title">🧠 ${esc(f.title)}</h2>
     <div class="mm-wrap mm-wrap-fullscreen" data-fiche-id="${f.id}">${renderMindmapHtml(f.id)}</div>
   </div>`;
+}
+
+// ---------- Frise chronologique ----------
+// Format d'une frise : une ligne par événement, « date | événement ». Ex. : 14 juillet 1789 | Prise de la Bastille
+function romanToInt(s){
+  const v = {i:1, v:5, x:10};
+  let t = 0;
+  for(let i=0;i<s.length;i++){ const a = v[s[i]], b = v[s[i+1]] || 0; t += a < b ? -a : a; }
+  return t;
+}
+function timelineSortKey(date){
+  const d = date.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const sm = /\b([ivx]+)(?:e|er|eme)?\s*siecle/.exec(d);
+  if(sm){ const n = romanToInt(sm[1]); if(n) return ((n-1)*100+50)*10000; }
+  const ym = /\b(\d{3,4})\b/.exec(d);
+  if(!ym) return null;
+  let year = parseInt(ym[1], 10);
+  const bc = /av\.?\s*j/.test(d);
+  if(bc) year = -year;
+  const months = ['janv','fevr','mars','avr','mai','juin','juil','aout','sept','oct','nov','dec'];
+  const mi = months.findIndex(m => d.includes(m));
+  const month = mi >= 0 ? mi + 1 : 0;
+  const dm = /^(\d{1,2})\s/.exec(d);
+  const day = dm ? parseInt(dm[1], 10) : 0;
+  return year*10000 + (bc ? -1 : 1) * (month*100 + day);
+}
+function parseTimeline(raw){
+  if(!raw) return [];
+  return raw.split('\n').map(l=>l.trim()).filter(Boolean).map(line=>{
+    const i = line.indexOf('|');
+    if(i < 0) return null;
+    const date = line.slice(0,i).trim(), text = line.slice(i+1).trim();
+    if(!date || !text) return null;
+    return { date, text, key: timelineSortKey(date) };
+  }).filter(Boolean);
+}
+function sortTimeline(events){
+  return events.map((e,i)=>({e,i})).sort((a,b)=>{
+    const ka = a.e.key, kb = b.e.key;
+    if(ka === null && kb === null) return a.i - b.i;
+    if(ka === null) return 1;
+    if(kb === null) return -1;
+    return (ka - kb) || (a.i - b.i);
+  }).map(x=>x.e);
+}
+function timelineItemsHtml(events){
+  return '<ol class="tl">' + events.map(e=>`<li class="tl-item"><div class="tl-date">${esc(e.date)}</div><div class="tl-text">${esc(e.text)}</div>${e.ficheId ? `<button type="button" class="link-chip tl-link" onclick="openFiche('${e.ficheId}')">${esc(e.ficheTitle)}</button>` : ''}</li>`).join('') + '</ol>';
+}
+function renderTimelineSection(ficheId){
+  const f = getFiche(ficheId);
+  const events = sortTimeline(parseTimeline(f && f.timeline));
+  if(!events.length) return '';
+  return `<div class="mindmap-section">
+    <h3 class="chapter-heading" style="margin-top:0;">🕰️ Frise chronologique</h3>
+    ${timelineItemsHtml(events)}
+  </div>`;
+}
+function isHistorySubject(s){ return !!s && (s.id === 'hg' || /histoire/i.test(s.name)); }
+function openGeneralTimeline(subjectId){ setView({type:'timeline', subjectId}); render(); }
+function renderGeneralTimeline(subjectId){
+  const s = getSubject(subjectId);
+  if(!s) return renderHome();
+  let events = [];
+  fichesOf(subjectId).forEach(f=>{
+    parseTimeline(f.timeline).forEach(e=> events.push({ ...e, ficheId: f.id, ficheTitle: f.title }));
+  });
+  events = sortTimeline(events);
+  return `
+    <button class="back-link" onclick="goToSubject('${s.id}')">← ${esc(s.name)}</button>
+    <p class="eyebrow">Frise générale</p>
+    <h1 class="hero" style="font-size:2rem;">🕰️ ${esc(s.name)}</h1>
+    ${events.length ? timelineItemsHtml(events) : `<div class="empty-state"><p>Aucun événement pour l'instant. Modifie une fiche et remplis « Frise chronologique » (une ligne par événement : date | événement).</p></div>`}
+  `;
 }
 
 // ---------- Astuce du jour ----------
@@ -1939,6 +2042,7 @@ async function submitFiche(ev){
   const titleOverride = form.titleOverride.value.trim();
   const chapter = form.chapter.value.trim();
   const mindmap = form.mindmap.value.trim();
+  const timeline = form.timeline.value.trim();
   const quiz = form.quiz.value.trim();
   const sources = form.sources.value.trim();
   const links = form.links ? Array.from(form.links.selectedOptions).map(o=>o.value) : [];
@@ -1962,13 +2066,13 @@ async function submitFiche(ev){
         if(f.history.length > 10) f.history = f.history.slice(-10);
       }
       f.subjectId = subjectId; f.title = title; f.content = content; f.chapter = chapter || undefined;
-      f.mindmap = mindmap || undefined;
+      f.mindmap = mindmap || undefined; f.timeline = timeline || undefined;
       f.quiz = quiz || undefined; f.links = links.length ? links : undefined; f.tags = tags.length ? tags : undefined;
       f.sources = sources || undefined;
       f.dateEdited = new Date().toISOString(); f.attachments = attachments; delete f.attachment;
     }
   }else{
-    data.fiches.push({ id: uid(), subjectId, title, content, chapter: chapter || undefined, mindmap: mindmap || undefined, quiz: quiz || undefined, links: links.length ? links : undefined, tags: tags.length ? tags : undefined, sources: sources || undefined, dateAdded: new Date().toISOString(), attachments });
+    data.fiches.push({ id: uid(), subjectId, title, content, chapter: chapter || undefined, mindmap: mindmap || undefined, timeline: timeline || undefined, quiz: quiz || undefined, links: links.length ? links : undefined, tags: tags.length ? tags : undefined, sources: sources || undefined, dateAdded: new Date().toISOString(), attachments });
   }
   lastSubjectId = subjectId;
   pendingAttachments = [];
@@ -1998,7 +2102,7 @@ async function undoDelete(){
     lastDeleted = null;
     clearTimeout(window.__undoTimer);
     await saveData();
-    setView({type:'manageSubjects'});
+    if(state.view !== 'settings') setView({type:'manageSubjects'});
     render();
   }
 }
@@ -2041,10 +2145,10 @@ async function pasteFromClipboard(){
 
 // ---------- Collage intelligent (fiche + quiz + liens en un coup) ----------
 function parseFicheBlock(raw){
-  const buffers = { titre:[], chapitre:[], contenu:[], cartementale:[], quiz:[], sources:[], liens:[] };
+  const buffers = { titre:[], chapitre:[], contenu:[], cartementale:[], frise:[], quiz:[], sources:[], liens:[] };
   let current = null;
   raw.split('\n').forEach(line=>{
-    const m = /^###\s*(TITRE|CHAPITRE|CONTENU|CARTE MENTALE|QUIZ|SOURCES|LIENS)\s*$/i.exec(line.trim());
+    const m = /^###\s*(TITRE|CHAPITRE|CONTENU|CARTE MENTALE|FRISE|QUIZ|SOURCES|LIENS)\s*$/i.exec(line.trim());
     if(m){ current = m[1].toLowerCase().replace(/\s+/g,''); return; }
     if(current && buffers[current]) buffers[current].push(line);
   });
@@ -2077,6 +2181,8 @@ async function applyFullPaste(){
   if(chapterInput && sections.chapitre) chapterInput.value = sections.chapitre;
   if(contentArea) contentArea.value = sections.contenu;
   if(mindmapArea) mindmapArea.value = sections.cartementale;
+  const timelineArea = document.getElementById('f-timeline');
+  if(timelineArea && sections.frise) timelineArea.value = sections.frise;
   if(quizArea) quizArea.value = sections.quiz;
   if(sourcesInput && sections.sources) sourcesInput.value = sections.sources;
   let matched = 0, total = 0;
@@ -2268,7 +2374,7 @@ async function handleDrop(ev, targetId){
   render();
 }
 
-async function deleteSubject(id){
+async function deleteSubject(id, backTo){
   const s = getSubject(id);
   if(!s) return;
   const relatedFiches = fichesOf(id);
@@ -2282,7 +2388,7 @@ async function deleteSubject(id){
   data.fiches = data.fiches.filter(f=>f.subjectId!==id);
   lastDeleted = { type:'subject', subject: s, fiches: relatedFiches, index: indexBackup };
   await saveData();
-  setView({type:'manageSubjects'});
+  setView(backTo === 'settings' ? 'settings' : {type:'manageSubjects'});
   render();
   scheduleUndoExpiry();
 }
@@ -2317,7 +2423,7 @@ function shareFiche(id){
     version: 1,
     subjectName: s ? s.name : null,
     fiche: {
-      title: f.title, content: f.content, chapter: f.chapter, quiz: f.quiz,
+      title: f.title, content: f.content, chapter: f.chapter, quiz: f.quiz, timeline: f.timeline,
       sources: f.sources, tags: f.tags, attachments: migrateAttachments(f)
     }
   };
@@ -2536,6 +2642,7 @@ function renderMain(){
   if(v==='settings') return renderSettings();
   if(v.type==='subject') return renderSubjectView(v.id);
   if(v.type==='tag') return renderTagView(v.tag);
+  if(v.type==='timeline') return renderGeneralTimeline(v.subjectId);
   if(v.type==='fiche') return renderFicheDetail(v.id);
   if(v.type==='addFiche') return renderFicheForm({subjectId: v.subjectId});
   if(v.type==='editFiche') return renderFicheForm({ficheId: v.id});
@@ -2825,6 +2932,16 @@ function renderSettings(){
       </div>
     </div>
 
+    <div class="howitworks">
+      <h2>🗂️ Matières</h2>
+      <p style="font-size:0.85rem; color:var(--ink-soft); margin:0 0 12px;">Supprimer une matière efface aussi toutes ses fiches (tu peux annuler pendant quelques secondes juste après).</p>
+      ${data.subjects.map(s=>{
+        const n = fichesOf(s.id).length;
+        return `<div class="settings-row"><span><span class="swatch" style="background:${s.color}"></span> ${s.emoji ? esc(s.emoji)+' ' : ''}${esc(s.name)} <span class="manage-count">(${n} fiche${n===1?'':'s'})${s.archived ? ' · archivée' : ''}</span></span><button class="btn ghost small" onclick="deleteSubject('${s.id}','settings')">🗑️ Supprimer</button></div>`;
+      }).join('')}
+      <div class="backup-row"><button class="footer-link" onclick="openManageSubjects()">Renommer, réordonner ou archiver…</button></div>
+    </div>
+
     <div class="howitworks" style="border-top-color:#A3342A;">
       <h2 style="color:#A3342A;">Zone sensible</h2>
       <p style="font-size:0.85rem; color:var(--ink-soft); margin:0 0 12px;">Supprime définitivement toutes tes fiches et remet les matières par défaut.</p>
@@ -2938,6 +3055,7 @@ function renderSubjectView(id){
         <div class="meta">${totalCount} fiche${totalCount===1?'':'s'}${s.archived ? '' : ' · #'+pad2(activeRank(id)+1)+' par importance'}</div>
       </div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        ${isHistorySubject(s) ? `<button class="btn ghost small" onclick="openGeneralTimeline('${s.id}')">🕰️ Frise générale</button>` : ''}
         ${totalCount ? `<button class="btn ghost small" onclick="openFlashcards('${s.id}')">🃏 Réviser</button>` : ''}
         ${totalCount ? `<button class="btn ghost small" onclick="openPresentation('${s.id}')">👥 Présentation à deux</button>` : ''}
         ${totalCount ? `<button class="btn ghost small" onclick="openPrintView('${s.id}')">🖨️ Imprimer</button>` : ''}
@@ -3032,6 +3150,7 @@ function renderFicheDetail(id){
         <button class="btn ghost" onclick="deleteFiche('${f.id}')">Supprimer cette fiche</button>
       </div>
       ${renderMindmapSection(f.id)}
+      ${renderTimelineSection(f.id)}
     </div>
   `;
 }
@@ -3279,6 +3398,7 @@ function renderFicheForm(opts){
   const initialChapter = editing ? (f.chapter || '') : '';
   const initialQuiz = editing ? (f.quiz || '') : '';
   const initialMindmap = editing ? (f.mindmap || '') : '';
+  const initialTimeline = editing ? (f.timeline || '') : '';
   const initialSources = editing ? (f.sources || '') : '';
   const initialLinks = editing ? (f.links || []) : [];
   const initialTags = editing ? (f.tags || []) : [];
@@ -3339,6 +3459,10 @@ function renderFicheForm(opts){
         <div class="field">
           <label for="f-mindmap">Carte mentale (facultatif)</label>
           <textarea id="f-mindmap" name="mindmap" placeholder="Une ligne de titre, puis des - pour les branches (indente de 2 espaces pour les sous-points). Ex. :&#10;Dérivées&#10;- Définition&#10;  - Taux de variation&#10;- Règles de calcul&#10;  - Somme&#10;  - Produit" style="min-height:110px;">${esc(initialMindmap)}</textarea>
+        </div>
+        <div class="field">
+          <label for="f-timeline">Frise chronologique (facultatif — surtout pour l'Histoire)</label>
+          <textarea id="f-timeline" name="timeline" placeholder="Une ligne par événement : date | événement. Ex. :&#10;14 juillet 1789 | Prise de la Bastille&#10;26 août 1789 | Déclaration des droits de l'homme et du citoyen" style="min-height:110px;">${esc(initialTimeline)}</textarea>
         </div>
         <div class="field">
           <label for="f-quiz">Questions de quiz (facultatif)</label>
